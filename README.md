@@ -9,7 +9,7 @@
 - [ ] Check if Owner
 - [ ] Fix Discord Webhook Avatar
 - [ ] Better RegEx
-- [ ] Run Test
+- [ ] Run Test Webhook Command
 - [ ] Migrate to Lambda
 
 ## Logic

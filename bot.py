@@ -46,7 +46,7 @@ async def get_device_code(ctx):
     return device_code, message
 
 
-async def get_bearer_token(ctx, interaction):
+async def get_oauth_token(ctx, interaction):
 
     expired = True
     data = table.get_item(Key={'id': str(ctx.user.id)})
@@ -86,17 +86,17 @@ async def get_bearer_token(ctx, interaction):
         "grant_type": "urn:ietf:params:oauth:grant-type:device_code"
     }
 
-    bearer_token = ""
+    oauth_token = ""
     interval = 5
 
-    while not bearer_token:
+    while not oauth_token:
         time.sleep(interval)
         r = requests.post(
             url="https://github.com/login/oauth/access_token", data=data, headers=headers).json()
         if "slow_down" in r:
             interval = int(r['interval'])
         elif "access_token" in r:
-            bearer_token = r['access_token']
+            oauth_token = r['access_token']
 
     if expired:
         embed = discord.Embed(
@@ -112,7 +112,7 @@ async def get_bearer_token(ctx, interaction):
     ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
     await interaction.edit_original_response(embed=embed)
 
-    return bearer_token
+    return oauth_token
 
 
 if __name__ == "__main__":
@@ -152,7 +152,7 @@ if __name__ == "__main__":
         ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
         interaction = await ctx.respond(embed=embed)
 
-        bearer_token = await get_bearer_token(ctx, interaction)
+        oauth_token = await get_oauth_token(ctx, interaction)
 
         # Create Discord Webhook
         webhook = await ctx.channel.create_webhook(name="GitHub")
@@ -160,7 +160,7 @@ if __name__ == "__main__":
         # Create Github Webook
         headers = {
             "Accept": "application/vnd.github+json",
-            "Authorization": "Bearer " + bearer_token,
+            "Authorization": "Bearer " + oauth_token,
         }
 
         data = {
