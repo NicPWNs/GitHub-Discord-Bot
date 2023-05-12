@@ -1,13 +1,16 @@
 # GitHub Bot for Discord
+
 Work in Progress 🚧
 
 ## To-Do
 
 - [x] Initial POC
-- [x] Store Device Codes
+- [x] Store Auth Tokens
 - [x] Move auth to DM
+- [x] Handle expired/invalid auth
 - [ ] Sub to More Events
 - [ ] Check if Owner
+- [ ] Account for max 15 webhooks (per channel), max 20 (for stars), etc.
 - [ ] Fix Discord Webhook Avatar
 - [ ] Better RegEx
 - [ ] Run Test Webhook Command
