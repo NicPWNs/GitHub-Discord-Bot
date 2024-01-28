@@ -9,6 +9,7 @@ Work in Progress 🚧
 - [x] Move auth to DM
 - [x] Handle expired/invalid auth
 - [ ] Encrypt tokens
+- [ ] Migrate to PyGithub
 - [ ] Sub to More Events
 - [ ] Check if Owner
 - [ ] Account for max 15 webhooks (per channel), max 20 (for stars), etc.
