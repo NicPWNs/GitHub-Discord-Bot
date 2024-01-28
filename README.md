@@ -8,6 +8,7 @@ Work in Progress 🚧
 - [x] Store Auth Tokens
 - [x] Move auth to DM
 - [x] Handle expired/invalid auth
+- [ ] Encrypt tokens
 - [ ] Sub to More Events
 - [ ] Check if Owner
 - [ ] Account for max 15 webhooks (per channel), max 20 (for stars), etc.
