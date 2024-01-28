@@ -133,7 +133,7 @@ if __name__ == "__main__":
                  interaction=""):
 
         # Extract repo name and owner from command option
-        repo_search = re.search(r"github.com\/*([\w.-]+)\/([\w.-]+)\/*", repository)
+        repo_search = re.search(r"[\/\/]*[github\.com]*[\/]*([\w.-]+)\/([\w.-]+)", repository)
 
         if repo_search:
             owner = repo_search.group(1)
