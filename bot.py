@@ -151,8 +151,11 @@ if __name__ == "__main__":
 
         oauth_token = await get_oauth_token(ctx, interaction)
 
+        # Clean repos with "discord" in the name
+        repo_clean = re.sub(r"(?i)discord", "disc*rd", repo)
+
         # Create Discord Webhook
-        webhook = await ctx.channel.create_webhook(name=f"{repo} GitHub {events}")
+        webhook = await ctx.channel.create_webhook(name=f"{repo_clean} GitHub {events}")
 
         # Create Github Webhook
         headers = {

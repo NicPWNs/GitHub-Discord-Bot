@@ -11,6 +11,7 @@ Work in Progress 🚧
 - [x] Better RegEx
 - [x] Encrypt tokens
 - [ ] Sub to More Events
+- [ ] Handle not finding repo
 - [ ] Check if Owner
 - [ ] Exit wait for auth after some time
 - [ ] Account for max 15 webhooks (per channel), max 20 (for stars), etc.
