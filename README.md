@@ -8,13 +8,13 @@ Work in Progress 🚧
 - [x] Store Auth Tokens
 - [x] Move auth to DM
 - [x] Handle expired/invalid auth
+- [x] Better RegEx
 - [ ] Encrypt tokens
 - [ ] Sub to More Events
 - [ ] Check if Owner
 - [ ] Exit wait for auth after some time
 - [ ] Account for max 15 webhooks (per channel), max 20 (for stars), etc.
 - [ ] Fix Discord Webhook Avatar
-- [ ] Better RegEx
 - [ ] Run Test Webhook Command
 - [ ] Migrate to Lambda
 
