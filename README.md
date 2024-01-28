@@ -9,7 +9,7 @@ Work in Progress 🚧
 - [x] Move auth to DM
 - [x] Handle expired/invalid auth
 - [x] Better RegEx
-- [ ] Encrypt tokens
+- [x] Encrypt tokens
 - [ ] Sub to More Events
 - [ ] Check if Owner
 - [ ] Exit wait for auth after some time
