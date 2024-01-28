@@ -8,11 +8,12 @@ import requests
 from dotenv import load_dotenv
 
 
+# AWS DynamoDB config
 TABLE = "discord-github"
 DDB = boto3.resource('dynamodb')
 table = DDB.Table(TABLE)
 
-
+# Authorize OAuth app with Device Flow
 async def get_device_code(ctx):
 
     headers = {
@@ -32,7 +33,7 @@ async def get_device_code(ctx):
     embed = discord.Embed(
         color=0xffffff,
         title="GitHub Authentication",
-        description=f"Enter Code `{r['user_code']}`\n\n At [GitHub.com/Login/Device]({r['verification_uri']})"
+        description=f"Enter Code:\n `{r['user_code']}`\n\n At [GitHub.com/Login/Device]({r['verification_uri']})"
     ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
 
     channel = await ctx.user.create_dm()
@@ -40,7 +41,7 @@ async def get_device_code(ctx):
 
     return device_code, message
 
-
+# Get access token for webhook creation
 async def get_oauth_token(ctx, interaction):
 
     oauth_token = ""
@@ -73,6 +74,7 @@ async def get_oauth_token(ctx, interaction):
 
     interval = 5
 
+    # Wait for user to authorize
     while not oauth_token:
         time.sleep(interval)
         r = requests.post(
@@ -95,6 +97,7 @@ async def get_oauth_token(ctx, interaction):
     ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
     await interaction.edit_original_response(embed=embed)
 
+    # Save access token for future requests
     table.put_item(
     Item={
         'id': str(ctx.user.id),
@@ -110,6 +113,7 @@ if __name__ == "__main__":
     load_dotenv()
     bot = discord.Bot()
 
+    # Options to subscribe to
     payloads = {
         "Everything": "everything",
         "Forks": "fork",
@@ -118,19 +122,18 @@ if __name__ == "__main__":
         "Pull Requests": "pull_request",
         "Pushes": "push",
         "Releases": "release",
+        "Security Advisories": "security_advisory",
         "Stars": "star",
     }
 
-    choices = list(payloads.keys())
-
-    @bot.slash_command(name="gh", description="Subscribe to a GitHub Repository in this channel.")
+    @bot.slash_command(name="gh", description="Subscribe to a GitHub repository in this channel.")
     async def gh(ctx: discord.ApplicationContext,
-                 repository: discord.Option(str, description="GitHub Repo", required=True),
-                 events: discord.Option(str, description="Events to Subscribe to", required=True, choices=choices),
+                 repository: discord.Option(str, description="GitHub Repo URL", required=True),
+                 events: discord.Option(str, description="Event to Subscribe to", required=True, choices=list(payloads.keys())),
                  interaction=""):
 
-        repo_search = re.search(
-            'github.com\/*([\w.-]+)\/([\w.-]+)\/*', repository)
+        # Extract repo name and owner from command option
+        repo_search = re.search(r"github.com\/*([\w.-]+)\/([\w.-]+)\/*", repository)
 
         if repo_search:
             owner = repo_search.group(1)
@@ -149,9 +152,9 @@ if __name__ == "__main__":
         oauth_token = await get_oauth_token(ctx, interaction)
 
         # Create Discord Webhook
-        webhook = await ctx.channel.create_webhook(name="GitHub")
+        webhook = await ctx.channel.create_webhook(name=f"{repo} GitHub {events}")
 
-        # Create Github Webook
+        # Create Github Webhook
         headers = {
             "Accept": "application/vnd.github+json",
             "Authorization": "Bearer " + oauth_token,
@@ -167,15 +170,13 @@ if __name__ == "__main__":
             "active": True,
         }
 
-        r = requests.post(
-            f"https://api.github.com/repos/{owner}/{repo}/hooks", headers=headers, json=data).json()
+        r = requests.post(f"https://api.github.com/repos/{owner}/{repo}/hooks", headers=headers, json=data).json()
 
         # Invalid Authentication
         if "config" not in r:
             await webhook.delete()
             table.delete_item(Key={'id': str(ctx.user.id)})
             await gh(ctx, repository, events, interaction)
-
             return
 
         embed = discord.Embed(

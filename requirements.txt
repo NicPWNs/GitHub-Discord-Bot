@@ -1,2 +1,4 @@
 py-cord
 python-dotenv
+boto3
+PyGithub
