@@ -10,13 +10,14 @@ Work in Progress 🚧
 - [x] Handle expired/invalid auth
 - [x] Better RegEx
 - [x] Encrypt tokens
-- [ ] Sub to More Events
-- [ ] Handle not finding repo
-- [ ] Check if Owner
+- [x] Remove stray Interaction option
+- [x] Fix Push, Everything, Security Advisory events
+- [x] Sub to More Events
+- [x] Handle not finding repo
+- [x] Check if Owner
 - [ ] Exit wait for auth after some time
 - [ ] Account for max 15 webhooks (per channel), max 20 (for stars), etc.
-- [ ] Fix Discord Webhook Avatar
-- [ ] Run Test Webhook Command
+- [x] Fix Discord Webhook Avatar
 - [ ] Migrate to Lambda
 
 ## Logic

@@ -9,11 +9,9 @@ from dotenv import load_dotenv
 
 
 # AWS DynamoDB config
-TABLE = "discord-github"
-DDB = boto3.resource('dynamodb')
-table = DDB.Table(TABLE)
+table = boto3.resource('dynamodb').Table("discord-github")
 
-# Authorize OAuth app with Device Flow
+# Authorize OAuth App with Device Flow
 async def get_device_code(ctx):
 
     headers = {
@@ -41,10 +39,10 @@ async def get_device_code(ctx):
 
     return device_code, message
 
-# Get access token for webhook creation
-async def get_oauth_token(ctx, interaction):
+# Get Access Token for GitHub Webhook Creation
+async def get_bearer_token(ctx, interaction):
 
-    oauth_token = ""
+    bearer_token = ""
 
     data = table.get_item(Key={'id': str(ctx.user.id)})
 
@@ -59,8 +57,9 @@ async def get_oauth_token(ctx, interaction):
         await interaction.edit_original_response(embed=embed)
         device_code, message = await get_device_code(ctx)
     else:
-        oauth_token = data['Item']['oauth_token']
-        return oauth_token
+        bearer_token = data['Item']['bearer_token']
+        user = data['Item']['github_user']
+        return bearer_token, user
 
     headers = {
         "Accept": "application/json"
@@ -75,14 +74,20 @@ async def get_oauth_token(ctx, interaction):
     interval = 5
 
     # Wait for user to authorize
-    while not oauth_token:
+    while not bearer_token:
         time.sleep(interval)
-        r = requests.post(
-            url="https://github.com/login/oauth/access_token", data=data, headers=headers).json()
+        r = requests.post(url="https://github.com/login/oauth/access_token", data=data, headers=headers).json()
         if "slow_down" in r:
             interval = int(r['interval'])
         elif "access_token" in r:
-            oauth_token = r['access_token']
+            bearer_token = r['access_token']
+
+    # GitHub Username
+    headers = {
+            "Accept": "application/vnd.github+json",
+            "Authorization": "Bearer " + bearer_token
+    }
+    user = requests.get(url="https://api.github.com/user", headers=headers).json()["login"]
 
     embed = discord.Embed(
         color=0x77b255,
@@ -101,11 +106,12 @@ async def get_oauth_token(ctx, interaction):
     table.put_item(
     Item={
         'id': str(ctx.user.id),
-        'username': str(ctx.user.name),
-        'oauth_token': str(oauth_token)
+        'discord_user': str(ctx.user.name),
+        'github_user': str(user),
+        'bearer_token': str(bearer_token)
     })
 
-    return oauth_token
+    return bearer_token, user
 
 
 if __name__ == "__main__":
@@ -113,26 +119,38 @@ if __name__ == "__main__":
     load_dotenv()
     bot = discord.Bot()
 
-    # Options to subscribe to
-    payloads = {
+    # Event Options
+    event_options = {
         "Everything": "everything",
+        "Branch Creations": "create",
+        "Branch Deletions": "delete",
+        "Code Scanning Alerts": "code_scanning_alert",
+        "Dependabot Alerts": "dependabot_alert",
+        "Deployments": "deployment",
+        "Discussions": "discussion",
         "Forks": "fork",
         "Issues": "issues",
+        "Labels": "label",
+        "Members": "member",
+        "Milestones": "milestone",
         "Packages": "package",
         "Pull Requests": "pull_request",
         "Pushes": "push",
         "Releases": "release",
-        "Security Advisories": "security_advisory",
+        "Secret Scanning Alerts": "secret_scanning_alert",
         "Stars": "star",
+        "Watch": "watch",
+        "Webhooks": "meta",
+        "Wikis": "gollum"
     }
 
+    # Register Slash Command
     @bot.slash_command(name="gh", description="Subscribe to a GitHub repository in this channel.")
     async def gh(ctx: discord.ApplicationContext,
-                 repository: discord.Option(str, description="GitHub Repo URL", required=True),
-                 events: discord.Option(str, description="Event to Subscribe to", required=True, choices=list(payloads.keys())),
-                 interaction=""):
+                 repository: discord.Option(str, description="GitHub Repo URL or Username/Repo format.", required=True),
+                 events: discord.Option(str, description="Event(s) to Subscribe to.", required=True, choices=list(event_options.keys()))):
 
-        # Extract repo name and owner from command option
+        # Extract Repo and Owner
         repo_search = re.search(r"[\/\/]*[github\.com]*[\/]*([\w.-]+)\/([\w.-]+)", repository)
 
         if repo_search:
@@ -144,51 +162,103 @@ if __name__ == "__main__":
             title="GitHub",
             description=f"<#{ctx.channel.id}> Subscribing to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})"
         ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
-        if interaction == "":
+
+        # Recursive Fork
+        try:
             interaction = await ctx.respond(embed=embed)
-        else:
+        except:
             await interaction.edit_original_response(embed=embed)
 
-        oauth_token = await get_oauth_token(ctx, interaction)
+        # Authenticate User
+        bearer_token, user = await get_bearer_token(ctx, interaction)
 
         # Clean repos with "discord" in the name
         repo_clean = re.sub(r"(?i)discord", "disc*rd", repo)
 
-        # Create Discord Webhook
-        webhook = await ctx.channel.create_webhook(name=f"{repo_clean} GitHub {events}")
+        # Discord Webhook Avatar
+        with open("github.png", "rb") as image:
+            file = image.read()
+            avatar = bytearray(file)
 
-        # Create Github Webhook
+        # Create Discord Webhook
+        webhook = await ctx.channel.create_webhook(name=f"{repo_clean} GitHub {events}",
+                                                   avatar=avatar,
+                                                   reason="Created by GitHub Bot for Discord")
+
+        # Handle Everything
+        if events == "Everything":
+            event_list = list(event_options.values())
+            event_list.remove("everything")
+        else:
+            event_list = [event_options[events]]
+
+        # Create GitHub Webhook
         headers = {
             "Accept": "application/vnd.github+json",
-            "Authorization": "Bearer " + oauth_token,
+            "Authorization": "Bearer " + bearer_token
         }
 
         data = {
             "name": "web",
             "config": {
                 "url": webhook.url + "/github",
-                "content_type": "json",
+                "content_type": "json"
             },
-            "events": [payloads[events]],
-            "active": True,
+            "events": event_list,
+            "active": True
         }
 
         r = requests.post(f"https://api.github.com/repos/{owner}/{repo}/hooks", headers=headers, json=data).json()
 
-        # Invalid Authentication
-        if "config" not in r:
-            await webhook.delete()
-            table.delete_item(Key={'id': str(ctx.user.id)})
-            await gh(ctx, repository, events, interaction)
+        # GitHub Error
+        if "Validation Failed" in r.__str__():
+            embed = discord.Embed(
+                color=0xbd2c00,
+                title="GitHub Error",
+                description=f"{r['errors'][0]['message']}\n\n[Check your GitHub Repo's Webhook Settings](https://github.com/{owner}/{repo}/settings/hooks)"
+            ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
+            await interaction.edit_original_response(embed=embed)
             return
 
-        embed = discord.Embed(
-            color=0xffffff,
-            title="GitHub",
-            description=f"<#{ctx.channel.id}>\nSubscribed to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})"
-        ).set_thumbnail(url=f"https://github.com/{owner}.png")
-        await interaction.edit_original_response(embed=embed)
+        # Invalid Authentication
+        if "Bad credentials" in r.__str__():
+            await webhook.delete()
+            table.delete_item(Key={'id': str(ctx.user.id)})
+            await gh(ctx, repository, events)
+            return
+
+        # Other Errors
+        if "Not Found" in r.__str__():
+            # Nonexistent Repo
+            if requests.get(f"https://github.com/{owner}/{repo}").status_code == 404:
+                embed = discord.Embed(
+                    color=0xbd2c00,
+                    title="Access Error",
+                    description=f"Repo [`{owner}/{repo}`](https://github.com/{owner}/{repo})\nis inaccessible or does not exist"
+                ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
+                await interaction.edit_original_response(embed=embed)
+                return
+
+            # Permissions Error
+            else:
+                embed = discord.Embed(
+                    color=0xbd2c00,
+                    title="Permission Error",
+                    description=f"GitHub user `{user}` can't create webhooks\non [`{owner}/{repo}`](https://github.com/{owner}/{repo})"
+                ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
+                await interaction.edit_original_response(embed=embed)
+                return
+
+        # Github Webhook Created
+        if "created_at" in r.__str__():
+            embed = discord.Embed(
+                color=0xffffff,
+                title="GitHub",
+                description=f"<#{ctx.channel.id}>\nSubscribed to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})"
+            ).set_thumbnail(url=f"https://github.com/{owner}.png")
+            await interaction.edit_original_response(embed=embed)
 
         return
 
+    # Start Bot
     bot.run(os.getenv('DISCORD_TOKEN'))
