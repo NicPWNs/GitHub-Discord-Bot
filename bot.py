@@ -8,6 +8,9 @@ import requests
 from dotenv import load_dotenv
 
 
+class TimeoutError(Exception):
+    pass
+
 # AWS DynamoDB config
 table = boto3.resource('dynamodb').Table("discord-github")
 
@@ -72,6 +75,7 @@ async def get_bearer_token(ctx, interaction):
     }
 
     interval = 5
+    start_time = time.time()
 
     # Wait for user to authorize
     while not bearer_token:
@@ -81,6 +85,14 @@ async def get_bearer_token(ctx, interaction):
             interval = int(r['interval'])
         elif "access_token" in r:
             bearer_token = r['access_token']
+        elif int(time.time() - start_time) > 300:
+            embed = discord.Embed(
+                color=0xbd2c00,
+                title="Timeout Error",
+                description=f"You didn't authenticate within five minutes"
+            ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
+            await interaction.edit_original_response(embed=embed)
+            raise TimeoutError
 
     # GitHub Username
     headers = {
@@ -121,7 +133,7 @@ if __name__ == "__main__":
 
     # Event Options
     event_options = {
-        "Everything": "everything",
+        "All Events": "all",
         "Branch Creations": "create",
         "Branch Deletions": "delete",
         "Code Scanning Alerts": "code_scanning_alert",
@@ -164,9 +176,10 @@ if __name__ == "__main__":
         ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
 
         # Recursive Fork
-        try:
+        if "interaction" not in globals():
+            global interaction
             interaction = await ctx.respond(embed=embed)
-        except:
+        else:
             await interaction.edit_original_response(embed=embed)
 
         # Authenticate User
@@ -177,18 +190,26 @@ if __name__ == "__main__":
 
         # Discord Webhook Avatar
         with open("github.png", "rb") as image:
-            file = image.read()
-            avatar = bytearray(file)
+            avatar = bytearray(image.read())
 
         # Create Discord Webhook
-        webhook = await ctx.channel.create_webhook(name=f"{repo_clean} GitHub {events}",
-                                                   avatar=avatar,
-                                                   reason="Created by GitHub Bot for Discord")
+        try:
+            webhook = await ctx.channel.create_webhook(name=f"{repo_clean} GitHub {events}",
+                                                       avatar=avatar,
+                                                       reason="Created by GitHub Bot for Discord")
+        except:
+            embed = discord.Embed(
+                color=0xbd2c00,
+                title="Discord Error",
+                description=f"Discord channel <#{ctx.channel.id}> can only have 15 webhooks."
+            ).set_thumbnail(url="https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6cc3c481a15a141738_icon_clyde_white_RGB.png")
+            await interaction.edit_original_response(embed=embed)
+            return
 
-        # Handle Everything
-        if events == "Everything":
+        # All Events
+        if events == "All Events":
             event_list = list(event_options.values())
-            event_list.remove("everything")
+            event_list.remove("all")
         else:
             event_list = [event_options[events]]
 
@@ -210,8 +231,16 @@ if __name__ == "__main__":
 
         r = requests.post(f"https://api.github.com/repos/{owner}/{repo}/hooks", headers=headers, json=data).json()
 
+        # Invalid Authentication
+        if "Bad credentials" in r.__str__():
+            await webhook.delete()
+            table.delete_item(Key={'id': str(ctx.user.id)})
+            await gh(ctx, repository, events)
+            return
+
         # GitHub Error
         if "Validation Failed" in r.__str__():
+            await webhook.delete()
             embed = discord.Embed(
                 color=0xbd2c00,
                 title="GitHub Error",
@@ -220,15 +249,9 @@ if __name__ == "__main__":
             await interaction.edit_original_response(embed=embed)
             return
 
-        # Invalid Authentication
-        if "Bad credentials" in r.__str__():
-            await webhook.delete()
-            table.delete_item(Key={'id': str(ctx.user.id)})
-            await gh(ctx, repository, events)
-            return
-
         # Other Errors
         if "Not Found" in r.__str__():
+            await webhook.delete()
             # Nonexistent Repo
             if requests.get(f"https://github.com/{owner}/{repo}").status_code == 404:
                 embed = discord.Embed(
@@ -249,7 +272,7 @@ if __name__ == "__main__":
                 await interaction.edit_original_response(embed=embed)
                 return
 
-        # Github Webhook Created
+        # GitHub Webhook Created
         if "created_at" in r.__str__():
             embed = discord.Embed(
                 color=0xffffff,
@@ -257,6 +280,8 @@ if __name__ == "__main__":
                 description=f"<#{ctx.channel.id}>\nSubscribed to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})"
             ).set_thumbnail(url=f"https://github.com/{owner}.png")
             await interaction.edit_original_response(embed=embed)
+
+        del interaction
 
         return
 

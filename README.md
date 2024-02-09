@@ -11,13 +11,13 @@ Work in Progress 🚧
 - [x] Better RegEx
 - [x] Encrypt tokens
 - [x] Remove stray Interaction option
-- [x] Fix Push, Everything, Security Advisory events
 - [x] Sub to More Events
 - [x] Handle not finding repo
 - [x] Check if Owner
-- [ ] Exit wait for auth after some time
-- [ ] Account for max 15 webhooks (per channel), max 20 (for stars), etc.
+- [x] Exit wait for auth after some time
 - [x] Fix Discord Webhook Avatar
+- [x] Fix recursion
+- [x] Account for max 15 webhooks (per channel), max 20 (for stars), etc.
 - [ ] Migrate to Lambda
 
 ## Logic
