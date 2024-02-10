@@ -85,7 +85,7 @@ async def get_bearer_token(ctx, interaction):
     interval = 5
     start_time = time()
 
-    # Wait for user to authorize
+    # User Authorization
     while not bearer_token:
         sleep(interval)
         r = post(
@@ -108,13 +108,6 @@ async def get_bearer_token(ctx, interaction):
             await interaction.edit_original_response(embed=embed)
             raise TimeoutError
 
-    # GitHub Username
-    headers = {
-        "Accept": "application/vnd.github+json",
-        "Authorization": "Bearer " + bearer_token,
-    }
-    user = get(url="https://api.github.com/user", headers=headers).json()["login"]
-
     embed = Embed(
         color=0x77B255,
         title="GitHub Authentication",
@@ -131,7 +124,14 @@ async def get_bearer_token(ctx, interaction):
     )
     await interaction.edit_original_response(embed=embed)
 
-    # Save access token for future requests
+    # GitHub Username
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": "Bearer " + bearer_token,
+    }
+    user = get(url="https://api.github.com/user", headers=headers).json()["login"]
+
+    # Save Token
     table.put_item(
         Item={
             "id": str(ctx.user.id),
@@ -219,7 +219,7 @@ if __name__ == "__main__":
         # Authenticate User
         bearer_token, user = await get_bearer_token(ctx, interaction)
 
-        # Clean repos with "discord" in the name
+        # Clean Repo Name
         repo_clean = sub(r"(?i)discord", "disc*rd", repo)
 
         # Discord Webhook Avatar
@@ -305,7 +305,7 @@ if __name__ == "__main__":
                 await interaction.edit_original_response(embed=embed)
                 return
 
-            # Permissions Error
+            # Permission Error
             else:
                 embed = Embed(
                     color=0xBD2C00,
