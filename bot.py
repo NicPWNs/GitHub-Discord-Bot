@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from os import getenv
-from re import search, sub
 from boto3 import resource
+from re import search, sub
 from time import time, sleep
 from requests import get, post
 from dotenv import load_dotenv
@@ -20,7 +20,7 @@ class TimeoutError(Exception):
     pass
 
 
-# AWS DynamoDB config
+# AWS DynamoDB Config
 table = resource("dynamodb").Table(TABLE)
 
 
