@@ -11,67 +11,67 @@ from dotenv import load_dotenv
 class TimeoutError(Exception):
     pass
 
+
 # AWS DynamoDB config
-table = boto3.resource('dynamodb').Table("discord-github")
+table = boto3.resource("dynamodb").Table("discord-github")
+
 
 # Authorize OAuth App with Device Flow
 async def get_device_code(ctx):
 
-    headers = {
-        "Accept": "application/json"
-    }
+    headers = {"Accept": "application/json"}
 
-    data = {
-        "client_id": os.getenv('GITHUB_CLIENT'),
-        "scope": "admin:repo_hook"
-    }
+    data = {"client_id": os.getenv("GITHUB_CLIENT"), "scope": "admin:repo_hook"}
 
     r = requests.post(
-        url="https://github.com/login/device/code", data=data, headers=headers).json()
+        url="https://github.com/login/device/code", data=data, headers=headers
+    ).json()
 
-    device_code = r['device_code']
+    device_code = r["device_code"]
 
     embed = discord.Embed(
-        color=0xffffff,
+        color=0xFFFFFF,
         title="GitHub Authentication",
-        description=f"Enter Code:\n `{r['user_code']}`\n\n At [GitHub.com/Login/Device]({r['verification_uri']})"
-    ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
+        description=f"Enter Code:\n `{r['user_code']}`\n\n At [GitHub.com/Login/Device]({r['verification_uri']})",
+    ).set_thumbnail(
+        url="https://github.githubassets.com/images/modules/open_graph/github-logo.png"
+    )
 
     channel = await ctx.user.create_dm()
     message = await channel.send(embed=embed)
 
     return device_code, message
 
+
 # Get Access Token for GitHub Webhook Creation
 async def get_bearer_token(ctx, interaction):
 
     bearer_token = ""
 
-    data = table.get_item(Key={'id': str(ctx.user.id)})
+    data = table.get_item(Key={"id": str(ctx.user.id)})
 
-    if int(data['ResponseMetadata']
-            ['HTTPHeaders']['content-length']) < 5:
+    if int(data["ResponseMetadata"]["HTTPHeaders"]["content-length"]) < 5:
         channel = await ctx.user.create_dm()
         embed = discord.Embed(
-            color=0xffffff,
+            color=0xFFFFFF,
             title="GitHub Authentication",
-            description=f"You Need to Authenticate with GitHub\n\nCheck <#{channel.id}>"
-        ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
+            description=f"You Need to Authenticate with GitHub\n\nCheck <#{channel.id}>",
+        ).set_thumbnail(
+            url="https://github.githubassets.com/images/modules/open_graph/github-logo.png"
+        )
         await interaction.edit_original_response(embed=embed)
         device_code, message = await get_device_code(ctx)
     else:
-        bearer_token = data['Item']['bearer_token']
-        user = data['Item']['github_user']
+        bearer_token = data["Item"]["bearer_token"]
+        user = data["Item"]["github_user"]
         return bearer_token, user
 
-    headers = {
-        "Accept": "application/json"
-    }
+    headers = {"Accept": "application/json"}
 
     data = {
-        "client_id": os.getenv('GITHUB_CLIENT'),
+        "client_id": os.getenv("GITHUB_CLIENT"),
         "device_code": device_code,
-        "grant_type": "urn:ietf:params:oauth:grant-type:device_code"
+        "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
     }
 
     interval = 5
@@ -80,48 +80,60 @@ async def get_bearer_token(ctx, interaction):
     # Wait for user to authorize
     while not bearer_token:
         time.sleep(interval)
-        r = requests.post(url="https://github.com/login/oauth/access_token", data=data, headers=headers).json()
+        r = requests.post(
+            url="https://github.com/login/oauth/access_token",
+            data=data,
+            headers=headers,
+        ).json()
         if "slow_down" in r:
-            interval = int(r['interval'])
+            interval = int(r["interval"])
         elif "access_token" in r:
-            bearer_token = r['access_token']
+            bearer_token = r["access_token"]
         elif int(time.time() - start_time) > 300:
             embed = discord.Embed(
-                color=0xbd2c00,
+                color=0xBD2C00,
                 title="Timeout Error",
-                description=f"You didn't authenticate within five minutes"
-            ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
+                description=f"You didn't authenticate within five minutes",
+            ).set_thumbnail(
+                url="https://github.githubassets.com/images/modules/open_graph/github-logo.png"
+            )
             await interaction.edit_original_response(embed=embed)
             raise TimeoutError
 
     # GitHub Username
     headers = {
-            "Accept": "application/vnd.github+json",
-            "Authorization": "Bearer " + bearer_token
+        "Accept": "application/vnd.github+json",
+        "Authorization": "Bearer " + bearer_token,
     }
-    user = requests.get(url="https://api.github.com/user", headers=headers).json()["login"]
+    user = requests.get(url="https://api.github.com/user", headers=headers).json()[
+        "login"
+    ]
 
     embed = discord.Embed(
-        color=0x77b255,
+        color=0x77B255,
         title="GitHub Authentication",
-        description=f"Authentication Successful ✅\n\nYou Can Return to <#{ctx.channel.id}>")
+        description=f"Authentication Successful ✅\n\nYou Can Return to <#{ctx.channel.id}>",
+    )
     await message.edit(embed=embed)
 
     embed = discord.Embed(
-        color=0xffffff,
+        color=0xFFFFFF,
         title="GitHub Authentication",
-        description=f"You're Authenticated!\n\nPlease Wait..."
-    ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
+        description=f"You're Authenticated!\n\nPlease Wait...",
+    ).set_thumbnail(
+        url="https://github.githubassets.com/images/modules/open_graph/github-logo.png"
+    )
     await interaction.edit_original_response(embed=embed)
 
     # Save access token for future requests
     table.put_item(
-    Item={
-        'id': str(ctx.user.id),
-        'discord_user': str(ctx.user.name),
-        'github_user': str(user),
-        'bearer_token': str(bearer_token)
-    })
+        Item={
+            "id": str(ctx.user.id),
+            "discord_user": str(ctx.user.name),
+            "github_user": str(user),
+            "bearer_token": str(bearer_token),
+        }
+    )
 
     return bearer_token, user
 
@@ -153,27 +165,44 @@ if __name__ == "__main__":
         "Stars": "star",
         "Watch": "watch",
         "Webhooks": "meta",
-        "Wikis": "gollum"
+        "Wikis": "gollum",
     }
 
     # Register Slash Command
-    @bot.slash_command(name="gh", description="Subscribe to a GitHub repository in this channel.")
-    async def gh(ctx: discord.ApplicationContext,
-                 repository: discord.Option(str, description="GitHub Repo URL or Username/Repo format.", required=True),
-                 events: discord.Option(str, description="Event(s) to Subscribe to.", required=True, choices=list(event_options.keys()))):
+    @bot.slash_command(
+        name="gh", description="Subscribe to a GitHub repository in this channel."
+    )
+    async def gh(
+        ctx: discord.ApplicationContext,
+        repository: discord.Option(
+            input_type=str,
+            description="GitHub Repo URL or Username/Repo format.",
+            required=True,
+        ),  # type: ignore
+        events: discord.Option(
+            input_type=str,
+            description="Event(s) to Subscribe to.",
+            required=True,
+            choices=list(event_options.keys()),
+        ),  # type: ignore
+    ):
 
         # Extract Repo and Owner
-        repo_search = re.search(r"[\/\/]*[github\.com]*[\/]*([\w.-]+)\/([\w.-]+)", repository)
+        repo_search = re.search(
+            r"[\/\/]*[github\.com]*[\/]*([\w.-]+)\/([\w.-]+)", repository
+        )
 
         if repo_search:
             owner = repo_search.group(1)
             repo = repo_search.group(2)
 
         embed = discord.Embed(
-            color=0xffffff,
+            color=0xFFFFFF,
             title="GitHub",
-            description=f"<#{ctx.channel.id}> Subscribing to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})"
-        ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
+            description=f"<#{ctx.channel.id}> Subscribing to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+        ).set_thumbnail(
+            url="https://github.githubassets.com/images/modules/open_graph/github-logo.png"
+        )
 
         # Recursive Fork
         if "interaction" not in globals():
@@ -194,15 +223,19 @@ if __name__ == "__main__":
 
         # Create Discord Webhook
         try:
-            webhook = await ctx.channel.create_webhook(name=f"{repo_clean} GitHub {events}",
-                                                       avatar=avatar,
-                                                       reason="Created by GitHub Bot for Discord")
+            webhook = await ctx.channel.create_webhook(
+                name=f"{repo_clean} GitHub {events}",
+                avatar=avatar,
+                reason="Created by GitHub Bot for Discord",
+            )
         except:
             embed = discord.Embed(
-                color=0xbd2c00,
+                color=0xBD2C00,
                 title="Discord Error",
-                description=f"Discord channel <#{ctx.channel.id}> can only have 15 webhooks."
-            ).set_thumbnail(url="https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6cc3c481a15a141738_icon_clyde_white_RGB.png")
+                description=f"Discord channel <#{ctx.channel.id}> can only have 15 webhooks.",
+            ).set_thumbnail(
+                url="https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6cc3c481a15a141738_icon_clyde_white_RGB.png"
+            )
             await interaction.edit_original_response(embed=embed)
             return
 
@@ -216,25 +249,26 @@ if __name__ == "__main__":
         # Create GitHub Webhook
         headers = {
             "Accept": "application/vnd.github+json",
-            "Authorization": "Bearer " + bearer_token
+            "Authorization": "Bearer " + bearer_token,
         }
 
         data = {
             "name": "web",
-            "config": {
-                "url": webhook.url + "/github",
-                "content_type": "json"
-            },
+            "config": {"url": webhook.url + "/github", "content_type": "json"},
             "events": event_list,
-            "active": True
+            "active": True,
         }
 
-        r = requests.post(f"https://api.github.com/repos/{owner}/{repo}/hooks", headers=headers, json=data).json()
+        r = requests.post(
+            f"https://api.github.com/repos/{owner}/{repo}/hooks",
+            headers=headers,
+            json=data,
+        ).json()
 
         # Invalid Authentication
         if "Bad credentials" in r.__str__():
             await webhook.delete()
-            table.delete_item(Key={'id': str(ctx.user.id)})
+            table.delete_item(Key={"id": str(ctx.user.id)})
             await gh(ctx, repository, events)
             return
 
@@ -242,10 +276,12 @@ if __name__ == "__main__":
         if "Validation Failed" in r.__str__():
             await webhook.delete()
             embed = discord.Embed(
-                color=0xbd2c00,
+                color=0xBD2C00,
                 title="GitHub Error",
-                description=f"{r['errors'][0]['message']}\n\n[Check your GitHub Repo's Webhook Settings](https://github.com/{owner}/{repo}/settings/hooks)"
-            ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
+                description=f"{r['errors'][0]['message']}\n\n[Check your GitHub Repo's Webhook Settings](https://github.com/{owner}/{repo}/settings/hooks)",
+            ).set_thumbnail(
+                url="https://github.githubassets.com/images/modules/open_graph/github-logo.png"
+            )
             await interaction.edit_original_response(embed=embed)
             return
 
@@ -255,29 +291,33 @@ if __name__ == "__main__":
             # Nonexistent Repo
             if requests.get(f"https://github.com/{owner}/{repo}").status_code == 404:
                 embed = discord.Embed(
-                    color=0xbd2c00,
+                    color=0xBD2C00,
                     title="Access Error",
-                    description=f"Repo [`{owner}/{repo}`](https://github.com/{owner}/{repo})\nis inaccessible or does not exist"
-                ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
+                    description=f"Repo [`{owner}/{repo}`](https://github.com/{owner}/{repo})\nis inaccessible or does not exist",
+                ).set_thumbnail(
+                    url="https://github.githubassets.com/images/modules/open_graph/github-logo.png"
+                )
                 await interaction.edit_original_response(embed=embed)
                 return
 
             # Permissions Error
             else:
                 embed = discord.Embed(
-                    color=0xbd2c00,
+                    color=0xBD2C00,
                     title="Permission Error",
-                    description=f"GitHub user `{user}` can't create webhooks\non [`{owner}/{repo}`](https://github.com/{owner}/{repo})"
-                ).set_thumbnail(url="https://github.githubassets.com/images/modules/open_graph/github-logo.png")
+                    description=f"GitHub user `{user}` can't create webhooks\non [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                ).set_thumbnail(
+                    url="https://github.githubassets.com/images/modules/open_graph/github-logo.png"
+                )
                 await interaction.edit_original_response(embed=embed)
                 return
 
         # GitHub Webhook Created
         if "created_at" in r.__str__():
             embed = discord.Embed(
-                color=0xffffff,
+                color=0xFFFFFF,
                 title="GitHub",
-                description=f"<#{ctx.channel.id}>\nSubscribed to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})"
+                description=f"<#{ctx.channel.id}>\nSubscribed to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
             ).set_thumbnail(url=f"https://github.com/{owner}.png")
             await interaction.edit_original_response(embed=embed)
 
@@ -286,4 +326,4 @@ if __name__ == "__main__":
         return
 
     # Start Bot
-    bot.run(os.getenv('DISCORD_TOKEN'))
+    bot.run(os.getenv("DISCORD_TOKEN"))

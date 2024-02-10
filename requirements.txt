@@ -1,3 +1,4 @@
-py-cord
 python-dotenv
+requests
+py-cord
 boto3
