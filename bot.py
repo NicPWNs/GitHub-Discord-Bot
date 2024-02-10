@@ -1,19 +1,27 @@
 #!/usr/bin/env python3
-import os
-import re
-import time
-import boto3
-import discord
-import requests
+from os import getenv
+from re import search, sub
+from boto3 import resource
+from time import time, sleep
+from requests import get, post
 from dotenv import load_dotenv
+from discord import ApplicationContext, Bot, Embed, Option
 
 
+# Load Secrets
+load_dotenv()
+TABLE = getenv("DDB_TABLE")
+GITHUB = getenv("GITHUB_CLIENT")
+DISCORD = getenv("DISCORD_TOKEN")
+
+
+# Authentication Timeout
 class TimeoutError(Exception):
     pass
 
 
 # AWS DynamoDB config
-table = boto3.resource("dynamodb").Table("discord-github")
+table = resource("dynamodb").Table(TABLE)
 
 
 # Authorize OAuth App with Device Flow
@@ -21,15 +29,15 @@ async def get_device_code(ctx):
 
     headers = {"Accept": "application/json"}
 
-    data = {"client_id": os.getenv("GITHUB_CLIENT"), "scope": "admin:repo_hook"}
+    data = {"client_id": GITHUB, "scope": "admin:repo_hook"}
 
-    r = requests.post(
+    r = post(
         url="https://github.com/login/device/code", data=data, headers=headers
     ).json()
 
     device_code = r["device_code"]
 
-    embed = discord.Embed(
+    embed = Embed(
         color=0xFFFFFF,
         title="GitHub Authentication",
         description=f"Enter Code:\n `{r['user_code']}`\n\n At [GitHub.com/Login/Device]({r['verification_uri']})",
@@ -52,7 +60,7 @@ async def get_bearer_token(ctx, interaction):
 
     if int(data["ResponseMetadata"]["HTTPHeaders"]["content-length"]) < 5:
         channel = await ctx.user.create_dm()
-        embed = discord.Embed(
+        embed = Embed(
             color=0xFFFFFF,
             title="GitHub Authentication",
             description=f"You Need to Authenticate with GitHub\n\nCheck <#{channel.id}>",
@@ -69,18 +77,18 @@ async def get_bearer_token(ctx, interaction):
     headers = {"Accept": "application/json"}
 
     data = {
-        "client_id": os.getenv("GITHUB_CLIENT"),
+        "client_id": GITHUB,
         "device_code": device_code,
         "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
     }
 
     interval = 5
-    start_time = time.time()
+    start_time = time()
 
     # Wait for user to authorize
     while not bearer_token:
-        time.sleep(interval)
-        r = requests.post(
+        sleep(interval)
+        r = post(
             url="https://github.com/login/oauth/access_token",
             data=data,
             headers=headers,
@@ -89,8 +97,8 @@ async def get_bearer_token(ctx, interaction):
             interval = int(r["interval"])
         elif "access_token" in r:
             bearer_token = r["access_token"]
-        elif int(time.time() - start_time) > 300:
-            embed = discord.Embed(
+        elif int(time() - start_time) > 300:
+            embed = Embed(
                 color=0xBD2C00,
                 title="Timeout Error",
                 description=f"You didn't authenticate within five minutes",
@@ -105,18 +113,16 @@ async def get_bearer_token(ctx, interaction):
         "Accept": "application/vnd.github+json",
         "Authorization": "Bearer " + bearer_token,
     }
-    user = requests.get(url="https://api.github.com/user", headers=headers).json()[
-        "login"
-    ]
+    user = get(url="https://api.github.com/user", headers=headers).json()["login"]
 
-    embed = discord.Embed(
+    embed = Embed(
         color=0x77B255,
         title="GitHub Authentication",
         description=f"Authentication Successful ✅\n\nYou Can Return to <#{ctx.channel.id}>",
     )
     await message.edit(embed=embed)
 
-    embed = discord.Embed(
+    embed = Embed(
         color=0xFFFFFF,
         title="GitHub Authentication",
         description=f"You're Authenticated!\n\nPlease Wait...",
@@ -140,8 +146,7 @@ async def get_bearer_token(ctx, interaction):
 
 if __name__ == "__main__":
 
-    load_dotenv()
-    bot = discord.Bot()
+    bot = Bot()
 
     # Event Options
     event_options = {
@@ -173,13 +178,13 @@ if __name__ == "__main__":
         name="gh", description="Subscribe to a GitHub repository in this channel."
     )
     async def gh(
-        ctx: discord.ApplicationContext,
-        repository: discord.Option(
+        ctx: ApplicationContext,
+        repository: Option(
             input_type=str,
             description="GitHub Repo URL or Username/Repo format.",
             required=True,
         ),  # type: ignore
-        events: discord.Option(
+        events: Option(
             input_type=str,
             description="Event(s) to Subscribe to.",
             required=True,
@@ -188,7 +193,7 @@ if __name__ == "__main__":
     ):
 
         # Extract Repo and Owner
-        repo_search = re.search(
+        repo_search = search(
             r"[\/\/]*[github\.com]*[\/]*([\w.-]+)\/([\w.-]+)", repository
         )
 
@@ -196,7 +201,7 @@ if __name__ == "__main__":
             owner = repo_search.group(1)
             repo = repo_search.group(2)
 
-        embed = discord.Embed(
+        embed = Embed(
             color=0xFFFFFF,
             title="GitHub",
             description=f"<#{ctx.channel.id}> Subscribing to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
@@ -215,7 +220,7 @@ if __name__ == "__main__":
         bearer_token, user = await get_bearer_token(ctx, interaction)
 
         # Clean repos with "discord" in the name
-        repo_clean = re.sub(r"(?i)discord", "disc*rd", repo)
+        repo_clean = sub(r"(?i)discord", "disc*rd", repo)
 
         # Discord Webhook Avatar
         with open("github.png", "rb") as image:
@@ -229,7 +234,7 @@ if __name__ == "__main__":
                 reason="Created by GitHub Bot for Discord",
             )
         except:
-            embed = discord.Embed(
+            embed = Embed(
                 color=0xBD2C00,
                 title="Discord Error",
                 description=f"Discord channel <#{ctx.channel.id}> can only have 15 webhooks.",
@@ -259,7 +264,7 @@ if __name__ == "__main__":
             "active": True,
         }
 
-        r = requests.post(
+        r = post(
             f"https://api.github.com/repos/{owner}/{repo}/hooks",
             headers=headers,
             json=data,
@@ -275,7 +280,7 @@ if __name__ == "__main__":
         # GitHub Error
         if "Validation Failed" in r.__str__():
             await webhook.delete()
-            embed = discord.Embed(
+            embed = Embed(
                 color=0xBD2C00,
                 title="GitHub Error",
                 description=f"{r['errors'][0]['message']}\n\n[Check your GitHub Repo's Webhook Settings](https://github.com/{owner}/{repo}/settings/hooks)",
@@ -289,8 +294,8 @@ if __name__ == "__main__":
         if "Not Found" in r.__str__():
             await webhook.delete()
             # Nonexistent Repo
-            if requests.get(f"https://github.com/{owner}/{repo}").status_code == 404:
-                embed = discord.Embed(
+            if get(f"https://github.com/{owner}/{repo}").status_code == 404:
+                embed = Embed(
                     color=0xBD2C00,
                     title="Access Error",
                     description=f"Repo [`{owner}/{repo}`](https://github.com/{owner}/{repo})\nis inaccessible or does not exist",
@@ -302,7 +307,7 @@ if __name__ == "__main__":
 
             # Permissions Error
             else:
-                embed = discord.Embed(
+                embed = Embed(
                     color=0xBD2C00,
                     title="Permission Error",
                     description=f"GitHub user `{user}` can't create webhooks\non [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
@@ -314,7 +319,7 @@ if __name__ == "__main__":
 
         # GitHub Webhook Created
         if "created_at" in r.__str__():
-            embed = discord.Embed(
+            embed = Embed(
                 color=0xFFFFFF,
                 title="GitHub",
                 description=f"<#{ctx.channel.id}>\nSubscribed to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
@@ -326,4 +331,4 @@ if __name__ == "__main__":
         return
 
     # Start Bot
-    bot.run(os.getenv("DISCORD_TOKEN"))
+    bot.run(DISCORD)
