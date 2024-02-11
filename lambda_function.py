@@ -29,7 +29,7 @@ def verify_signature(event):
 
 
 # Lambda Executes
-def lambda_handler(event):
+def lambda_handler(event, context):
 
     # Signature Headers
     verify_signature(event)
