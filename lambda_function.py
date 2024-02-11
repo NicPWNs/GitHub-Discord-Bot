@@ -42,7 +42,7 @@ def lambda_handler(event, context):
     sqs = client("sqs")
     r = sqs.send_message(
         QueueUrl="https://sqs.us-east-1.amazonaws.com/087441767329/github-discord-queue",
-        MessageBody=body,
+        MessageBody=dumps(body),
     )
     print(r)
 
