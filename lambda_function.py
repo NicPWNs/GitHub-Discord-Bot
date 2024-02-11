@@ -1,5 +1,5 @@
 from os import getenv
-from json import loads
+from json import dumps
 from re import search, sub
 from requests import get, post
 from dotenv import load_dotenv
@@ -34,7 +34,7 @@ def verify_signature(event):
 # Lambda Executes
 def lambda_handler(event, context):
 
-    event = loads(event)
+    event = dumps(event)
 
     # Signature Headers
     verify_signature(event)
