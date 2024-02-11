@@ -21,9 +21,9 @@ def verify_signature(event):
 
     print(event)
 
-    signature = event["params"]["header"]["X-Signature-Ed25519"]
+    signature = event["params"]["header"]["x-signature-ed25519"]
     print(signature)
-    timestamp = event["params"]["header"]["X-Signature-Timestamp"]
+    timestamp = event["params"]["header"]["x-signature-timestamp"]
     print(timestamp)
     body = event["body-json"]
 
