@@ -40,8 +40,7 @@ def lambda_handler(event, context):
     # 200 Response
     embeds = [
         {
-            "title": "GitHub",
-            "description": "⏳  Loading...",
+            "title": "⏳  Loading...",
             "color": 0xFEE9B6,
             "thumbnail": {
                 "url": "https://frogtummydev.p1.vahara.com/globalsite/assets/images/animated_spinner.gif"
