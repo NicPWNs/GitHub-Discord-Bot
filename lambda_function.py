@@ -16,6 +16,7 @@ PUBLIC_KEY = getenv("PUBLIC_KEY")
 
 # Signature Verification
 def verify_signature(event):
+    print(PUBLIC_KEY)
     verify_key = VerifyKey(bytes.fromhex(PUBLIC_KEY))
 
     signature = event.headers["X-Signature-Ed25519"]
