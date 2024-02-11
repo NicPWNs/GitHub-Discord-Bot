@@ -38,7 +38,7 @@ def lambda_handler(event, context):
     # 200 Response
     embeds = [{"title": "⏳  Loading...", "color": 0xFEE9B6}]
 
-    yield {"type": 4, "data": {"embeds": embeds}}
+    yield dumps({"type": 4, "data": {"embeds": embeds}})
 
     # SQS Queue
     sqs = client("sqs")
@@ -46,3 +46,5 @@ def lambda_handler(event, context):
         QueueUrl="https://sqs.us-east-1.amazonaws.com/087441767329/github-discord-queue",
         MessageBody=dumps(body),
     )
+
+    return
