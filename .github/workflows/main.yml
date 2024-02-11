@@ -33,13 +33,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Publish slash commands to Discord
+      - name: Register slash commands with Discord
+        id: register
         env:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           APP_ID: ${{ secrets.DISCORD_APP_ID }}
         run: |
           output=$(python register_commands.py)
-          echo "{publishStatus}={output}" >> $GITHUB_OUTPUT
-        id: step1
+          echo "output={output}" >> $GITHUB_OUTPUT
       - name: Print status
-        run: echo "${{ steps.step1.outputs.publishStatus }}"
+        run: echo "${{ steps.register.outputs.output }}"
