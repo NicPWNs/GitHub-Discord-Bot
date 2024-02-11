@@ -68,8 +68,4 @@ def lambda_handler(event, context):
         }
     ]
 
-    url = f"https://discord.com/api/v10/interactions/{interaction}/{token}/callback"
-
-    json = {"type": 4, "data": {"embeds": embeds}}
-    r = post(url, json=json).json()
-    print(r)
+    return {"type": 4, "data": {"embeds": embeds}}
