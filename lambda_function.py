@@ -43,8 +43,8 @@ def lambda_handler(event, context):
         return {"type": 1}
 
     # Get Options
-    repository = body.data.options[0].value
-    events = body.data.options[1].value
+    repository = body["data"]["options"][0]["value"]
+    events = body["data"]["options"][1]["value"]
 
     # Extract Repo and Owner
     repo_search = search(r"[\/\/]*[github\.com]*[\/]*([\w.-]+)\/([\w.-]+)", repository)
@@ -57,7 +57,7 @@ def lambda_handler(event, context):
         {
             "type": "rich",
             "title": "GitHub",
-            "description": f"<#{body.channel.id}> Subscribing to {events}\\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+            "description": f"<#{body["channel"]["id"]}> Subscribing to {events}\\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
             "color": 0xFFFFFF,
             "thumbnail": {
                 "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
@@ -68,7 +68,7 @@ def lambda_handler(event, context):
     ]
 
     url = (
-        f"https://discord.com/api/v10/interactions/{body.data.id}/{body.token}/callback"
+        f"https://discord.com/api/v10/interactions/{body["data"]["id"]}/{body["token"]}/callback"
     )
 
     json = {"type": 4, "data": {"embeds": embeds}}
