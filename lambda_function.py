@@ -35,11 +35,6 @@ def lambda_handler(event, context):
     if body["type"] == 1:
         return {"type": 1}
 
-    # 200 Response
-    embeds = [{"title": "⏳  Loading...", "color": 0xFEE9B6}]
-
-    yield dumps({"type": 4, "data": {"embeds": embeds}})
-
     # SQS Queue
     sqs = client("sqs")
     sqs.send_message(
@@ -47,4 +42,7 @@ def lambda_handler(event, context):
         MessageBody=dumps(body),
     )
 
-    return
+    # 200 Response
+    embeds = [{"title": "⏳  Loading...", "color": 0xFEE9B6}]
+
+    return {"type": 4, "data": {"embeds": embeds}}
