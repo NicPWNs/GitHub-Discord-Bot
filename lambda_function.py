@@ -39,12 +39,9 @@ def lambda_handler(event, context):
 
     # Ping Messages
     body = event.get("body-json")
-    if body.get("type") == 1:
+    if body["type"] == 1:
         return {"type": 1}
 
-    return {"type": 1}
-
-    """
     # Get Options
     repository = body.data.options[0].value
     events = body.data.options[1].value
@@ -60,7 +57,7 @@ def lambda_handler(event, context):
         {
             "type": "rich",
             "title": "GitHub",
-            "description": f"<#{body.data.channel.id}> Subscribing to {events}\\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+            "description": f"<#{body.channel.id}> Subscribing to {events}\\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
             "color": 0xFFFFFF,
             "thumbnail": {
                 "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
@@ -70,8 +67,10 @@ def lambda_handler(event, context):
         }
     ]
 
-    url = "https://discord.com/api/v10/interactions/<interaction_id>/<interaction_token>/callback"
+    url = (
+        f"https://discord.com/api/v10/interactions/{body.data.id}/{body.token}/callback"
+    )
 
     json = {"type": 4, "data": {"embeds": embeds}}
     r = post(url, json=json)
-    """
+    print(r)
