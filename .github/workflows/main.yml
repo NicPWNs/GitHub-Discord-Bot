@@ -39,7 +39,7 @@ jobs:
           APP_ID: ${{ secrets.DISCORD_APP_ID }}
         run: |
           output=$(python register_commands.py)
-          echo "{publishStatus}={value}" >> $GITHUB_OUTPUT"
+          echo "{publishStatus}={value}" >> $GITHUB_OUTPUT
         id: step1
       - name: Print status
         run: echo "${{ steps.step1.outputs.publishStatus }}"
