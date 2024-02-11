@@ -44,7 +44,7 @@ def lambda_handler(event, context):
             "description": "⏳  Loading...",
             "color": 0xFEE9B6,
             "thumbnail": {
-                "url": "https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/images/octocat-spinner-128-bright.gif"
+                "url": "https://upload.wikimedia.org/wikipedia/commons/a/ad/YouTube_loading_symbol_3_%28transparent%29.gif"
             },
         }
     ]
