@@ -38,14 +38,6 @@ def lambda_handler(event, context):
         return {"type": 1}
 
     # 200 Response
-    embeds = [
-        {
-            "title": "⏳  Loading...",
-            "color": 0xFEE9B6,
-            "thumbnail": {
-                "url": "https://raw.githubusercontent.com/NicPWNs/GitHub-Discord-Bot/main/assets/spinner.gif"
-            },
-        }
-    ]
+    embeds = [{"title": "⏳  Loading...", "color": 0xFEE9B6}]
 
     return {"type": 4, "data": {"embeds": embeds}}
