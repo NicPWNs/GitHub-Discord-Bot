@@ -49,7 +49,6 @@ json = {
                 {"name": "Watch", "value": "watch"},
                 {"name": "Webhooks", "value": "meta"},
                 {"name": "Wikis", "value": "gollum"},
-                {"name": "TEST", "value": "test"},
             ],
         },
     ],
