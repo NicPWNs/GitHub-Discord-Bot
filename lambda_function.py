@@ -44,7 +44,7 @@ def lambda_handler(event, context):
             "description": "⏳  Loading...",
             "color": 0xFEE9B6,
             "thumbnail": {
-                "url": "https://upload.wikimedia.org/wikipedia/commons/a/ad/YouTube_loading_symbol_3_%28transparent%29.gif"
+                "url": "https://frogtummydev.p1.vahara.com/globalsite/assets/images/animated_spinner.gif"
             },
         }
     ]
