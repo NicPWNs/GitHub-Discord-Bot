@@ -19,8 +19,6 @@ PUBLIC_KEY = getenv("PUBLIC_KEY")
 def verify_signature(event):
     verify_key = VerifyKey(bytes.fromhex(PUBLIC_KEY))
 
-    print(event)
-
     signature = event["params"]["header"]["x-signature-ed25519"]
     timestamp = event["params"]["header"]["x-signature-timestamp"]
     body = event["rawBody"]
@@ -42,6 +40,11 @@ def lambda_handler(event, context):
     if body["type"] == 1:
         return {"type": 1}
 
+    # Application Command Context
+    channel = body["channel_id"]
+    interaction = body["data"]["id"]
+    token = body["token"]
+
     # Get Options
     repository = body["data"]["options"][0]["value"]
     events = body["data"]["options"][1]["value"]
@@ -57,19 +60,15 @@ def lambda_handler(event, context):
         {
             "type": "rich",
             "title": "GitHub",
-            "description": f"<#{body["channel"]["id"]}> Subscribing to {events}\\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+            "description": f"<#{channel}> Subscribing to {events}\\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
             "color": 0xFFFFFF,
             "thumbnail": {
-                "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
-                "height": 0,
-                "width": 0,
+                "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png"
             },
         }
     ]
 
-    url = (
-        f"https://discord.com/api/v10/interactions/{body["data"]["id"]}/{body["token"]}/callback"
-    )
+    url = f"https://discord.com/api/v10/interactions/{interaction}/{token}/callback"
 
     json = {"type": 4, "data": {"embeds": embeds}}
     r = post(url, json=json)
