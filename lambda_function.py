@@ -1,4 +1,5 @@
 from os import getenv
+from json import dumps
 from re import search, sub
 from requests import get, post
 from dotenv import load_dotenv
@@ -16,7 +17,6 @@ PUBLIC_KEY = getenv("PUBLIC_KEY")
 
 # Signature Verification
 def verify_signature(event):
-    print(PUBLIC_KEY)
     verify_key = VerifyKey(bytes.fromhex(PUBLIC_KEY))
 
     signature = event.headers["X-Signature-Ed25519"]
@@ -40,7 +40,7 @@ def lambda_handler(event, context):
     if body.get("type") == 1:
         return {"type": 1}
 
-    return {"type": 1}
+    return dumps({"type": 1})
 
     """
     # Get Options
