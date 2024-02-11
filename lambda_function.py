@@ -1,5 +1,6 @@
 from os import getenv
 from json import dumps
+from boto3 import client
 from re import search, sub
 from requests import get, post
 from dotenv import load_dotenv
@@ -36,6 +37,14 @@ def lambda_handler(event, context):
     body = event.get("body-json")
     if body["type"] == 1:
         return {"type": 1}
+
+    # SQS Queue
+    sqs = client("sqs")
+    r = sqs.send_message(
+        QueueUrl="https://sqs.us-east-1.amazonaws.com/087441767329/github-discord-queue",
+        MessageBody=body,
+    )
+    print(r)
 
     # 200 Response
     embeds = [{"title": "⏳  Loading...", "color": 0xFEE9B6}]
