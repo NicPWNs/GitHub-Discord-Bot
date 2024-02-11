@@ -27,17 +27,17 @@ def verify_signature(event):
     print(timestamp)
     body = event["body-json"]
 
-    try:
-        verify_key.verify(f"{timestamp}{body}".encode(), bytes.fromhex(signature))
-    except BadSignatureError:
-        raise Exception("401: Invalid Request Signature")
+    verify_key.verify(f"{timestamp}{body}".encode(), bytes.fromhex(signature))
 
 
 # Lambda Executes
 def lambda_handler(event, context):
 
     # Signature Headers
-    verify_signature(event)
+    try:
+        verify_signature(event)
+    except:
+        raise Exception("401: Invalid Request Signature")
 
     # Ping Messages
     body = event.get("body-json")
