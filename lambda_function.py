@@ -43,7 +43,7 @@ def lambda_handler(event, context):
             "title": "⏳  Loading...",
             "color": 0xFEE9B6,
             "thumbnail": {
-                "url": "https://frogtummydev.p1.vahara.com/globalsite/assets/images/animated_spinner.gif"
+                "url": "https://raw.githubusercontent.com/NicPWNs/GitHub-Discord-Bot/main/assets/loading.gif"
             },
         }
     ]
