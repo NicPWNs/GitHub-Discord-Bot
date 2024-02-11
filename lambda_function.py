@@ -22,7 +22,9 @@ def verify_signature(event):
     print(event)
 
     signature = event["params"]["header"]["X-Signature-Ed25519"]
+    print(signature)
     timestamp = event["params"]["header"]["X-Signature-Timestamp"]
+    print(timestamp)
     body = event["body-json"]
 
     try:
