@@ -12,8 +12,8 @@ jobs:
       - name: Deploy code to Lambda
         uses: mariamrf/py-lambda-action@v1.0.0
         with:
-          lambda_layer_arn: "arn:aws:lambda:us-east-1:391107963258:layer:lambda_deps"
-          lambda_function_name: "lambda_function"
+          lambda_layer_arn: "arn:aws:lambda:us-east-1:087441767329:function:github_discord_event_handler"
+          lambda_function_name: "github_discord_event_handler"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
