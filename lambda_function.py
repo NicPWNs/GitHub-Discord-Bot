@@ -39,6 +39,9 @@ def lambda_handler(event, context):
     if body.get("type") == 1:
         return {"type": 1}
 
+    return {"type": 1}
+
+    """
     # Get Options
     repository = body.data.options[0].value
     events = body.data.options[1].value
@@ -68,3 +71,4 @@ def lambda_handler(event, context):
 
     json = {"type": 4, "data": {"embeds": embeds}}
     r = post(url, json=json)
+    """
