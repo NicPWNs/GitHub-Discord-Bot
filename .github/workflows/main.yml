@@ -8,9 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
       - name: Deploy code to Lambda
-        uses: NicPWNs/py-lambda-action@v1.0.9
+        uses: NicPWNs/py-lambda-action@main
         with:
           lambda_layer_arn: "arn:aws:lambda:us-east-1:087441767329:layer:lambda_deps"
           lambda_function_name: "github-discord-event-handler"
@@ -24,9 +24,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
       - name: Install Python 3
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@main
         with:
           python-version: 3.11
       - name: Install dependencies
