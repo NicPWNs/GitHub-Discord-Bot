@@ -39,7 +39,4 @@ jobs:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           APP_ID: ${{ secrets.DISCORD_APP_ID }}
         run: |
-          output=$(python register_commands.py)
-          "output=output" >> $GITHUB_OUTPUT
-      - name: Print status
-        run: echo "${{ steps.register.outputs.output }}"
+          python register_commands.py
