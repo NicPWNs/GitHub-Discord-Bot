@@ -1,11 +1,8 @@
 from os import getenv
 from json import dumps
 from boto3 import client
-from re import search, sub
-from requests import get, post
 from dotenv import load_dotenv
 from nacl.signing import VerifyKey
-from nacl.exceptions import BadSignatureError
 
 
 # Load Secrets
@@ -40,11 +37,10 @@ def lambda_handler(event, context):
 
     # SQS Queue
     sqs = client("sqs")
-    r = sqs.send_message(
+    sqs.send_message(
         QueueUrl="https://sqs.us-east-1.amazonaws.com/087441767329/github-discord-queue",
         MessageBody=dumps(body),
     )
-    print(r)
 
     # 200 Response
     embeds = [{"title": "⏳  Loading...", "color": 0xFEE9B6}]
