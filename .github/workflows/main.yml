@@ -1,0 +1,45 @@
+name: Deploy to Lambda
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+      - name: Deploy code to Lambda
+        uses: mariamrf/py-lambda-action@v1.0.0
+        with:
+          lambda_layer_arn: "arn:aws:lambda:us-east-1:391107963258:layer:lambda_deps"
+          lambda_function_name: "lambda_function"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: "us-east-1"
+  publish:
+    needs: build
+    if: needs.build.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+      - name: Install Python 3
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Publish slash commands to Discord
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          APP_ID: ${{ secrets.DISCORD_APP_ID }}
+        run: |
+          output=$(python register_commands.py)
+          echo "::set-output name=publishStatus::$output"
+        id: step1
+      - name: Print status
+        run: echo "${{ steps.step1.outputs.publishStatus }}"
