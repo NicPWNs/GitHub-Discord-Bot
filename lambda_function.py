@@ -23,7 +23,7 @@ def verify_signature(event):
 
     signature = event["params"]["header"]["X-Signature-Ed25519"]
     timestamp = event["params"]["header"]["X-Signature-Timestamp"]
-    body = str(event["body-json"]).decode("utf-8")
+    body = event["body-json"]
 
     try:
         verify_key.verify(f"{timestamp}{body}".encode(), bytes.fromhex(signature))

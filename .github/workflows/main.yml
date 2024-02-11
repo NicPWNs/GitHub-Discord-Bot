@@ -4,7 +4,7 @@ on:
     branches:
       - main
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo
@@ -18,9 +18,9 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: "us-east-1"
-  publish:
-    needs: build
-    if: needs.build.result == 'success'
+  build:
+    needs: deploy
+    if: needs.deploy.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo
