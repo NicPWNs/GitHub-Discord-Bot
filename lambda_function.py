@@ -35,14 +35,14 @@ def lambda_handler(event, context):
     if body["type"] == 1:
         return {"type": 1}
 
+    # 200 Response
+    embeds = [{"title": "⏳  Loading...", "color": 0xFEE9B6}]
+
+    yield {"type": 4, "data": {"embeds": embeds}}
+
     # SQS Queue
     sqs = client("sqs")
     sqs.send_message(
         QueueUrl="https://sqs.us-east-1.amazonaws.com/087441767329/github-discord-queue",
         MessageBody=dumps(body),
     )
-
-    # 200 Response
-    embeds = [{"title": "⏳  Loading...", "color": 0xFEE9B6}]
-
-    return {"type": 4, "data": {"embeds": embeds}}
