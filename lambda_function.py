@@ -43,7 +43,7 @@ def lambda_handler(event, context):
             "title": "⏳  Loading...",
             "color": 0xFEE9B6,
             "thumbnail": {
-                "url": "https://raw.githubusercontent.com/NicPWNs/GitHub-Discord-Bot/main/assets/loading.gif"
+                "url": "https://raw.githubusercontent.com/NicPWNs/GitHub-Discord-Bot/main/assets/spinner.gif"
             },
         }
     ]
