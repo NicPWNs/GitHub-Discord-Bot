@@ -18,7 +18,8 @@ Work in Progress 🚧
 - [x] Fix Discord Webhook Avatar
 - [x] Fix recursion
 - [x] Account for max 15 webhooks (per channel), max 20 (for stars), etc.
-- [ ] Migrate to Lambda
+- [x] Migrate to Lambda
+- [ ] Migrate to SAM
 
 ## Logic
 
