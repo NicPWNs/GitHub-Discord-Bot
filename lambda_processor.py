@@ -231,7 +231,7 @@ async def get_bearer_token(event):
 
 
 # Lambda Executes
-def lambda_handler(event, context):
+def lambda_processor(event, context):
 
     # Interaction Context
     repository = event["data"]["options"][0]["value"]

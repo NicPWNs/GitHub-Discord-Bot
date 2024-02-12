@@ -9,11 +9,21 @@ jobs:
     steps:
       - name: Checkout the repo
         uses: actions/checkout@main
-      - name: Deploy code to Lambda
+      - name: Deploy handler code to Lambda
         uses: NicPWNs/py-lambda-action@main
         with:
           lambda_layer_arn: "arn:aws:lambda:us-east-1:087441767329:layer:lambda_deps"
           lambda_function_name: "github-discord-event-handler"
+          python_version: "3.11"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: "us-east-1"
+      - name: Deploy processor code to Lambda
+        uses: NicPWNs/py-lambda-action@main
+        with:
+          lambda_layer_arn: "arn:aws:lambda:us-east-1:087441767329:layer:lambda_deps"
+          lambda_function_name: "github-discord-event-processor"
           python_version: "3.11"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
