@@ -347,7 +347,7 @@ def lambda_processor(event, context):
     if "Bad credentials" in r.__str__():
         delete(url=f"https://discord.com/api/webhooks/{webhook}")
         table.delete_item(Key={"id": str(discord_user_id)})
-        lambda_handler(event, context)
+        lambda_processor(event, context)
         return
 
     # GitHub Error
