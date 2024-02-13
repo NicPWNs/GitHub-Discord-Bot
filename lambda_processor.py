@@ -132,6 +132,7 @@ def get_bearer_token(event):
     else:
         bearer_token = data["Item"]["bearer_token"]
         user = data["Item"]["github_user"]
+        print(f"HELLO {bearer_token}{user}")
         return bearer_token, user
 
     data = {
