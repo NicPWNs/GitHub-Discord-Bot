@@ -83,7 +83,8 @@ def get_device_code(dm_channel):
         url=f"https://discord.com/api/channels/{dm_channel}/messages",
         json=data,
         headers=discord_headers,
-    )
+    ).json()
+    print(dm_message)
 
     return device_code, dm_message
 
