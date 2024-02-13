@@ -106,19 +106,16 @@ def get_bearer_token(event, token):
 
         # Channel Auth Begin
         data = {
-            "type": 4,
-            "data": {
-                "embeds": [
-                    {
-                        "title": "GitHub Authentication",
-                        "description": f"You Need to Authenticate with GitHub\n\nCheck <#{dm_channel}>",
-                        "color": 0xFFFFFF,
-                        "thumbnail": {
-                            "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
-                        },
-                    }
-                ]
-            },
+            "embeds": [
+                {
+                    "title": "GitHub Authentication",
+                    "description": f"You Need to Authenticate with GitHub\n\nCheck <#{dm_channel}>",
+                    "color": 0xFFFFFF,
+                    "thumbnail": {
+                        "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                    },
+                }
+            ]
         }
 
         patch(
@@ -155,19 +152,16 @@ def get_bearer_token(event, token):
             bearer_token = r["access_token"]
         elif int(time() - start_time) > 300:
             data = {
-                "type": 4,
-                "data": {
-                    "embeds": [
-                        {
-                            "title": "Timeout Error",
-                            "description": "You didn't authenticate within five minutes",
-                            "color": 0xBD2C00,
-                            "thumbnail": {
-                                "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
-                            },
-                        }
-                    ]
-                },
+                "embeds": [
+                    {
+                        "title": "Timeout Error",
+                        "description": "You didn't authenticate within five minutes",
+                        "color": 0xBD2C00,
+                        "thumbnail": {
+                            "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                        },
+                    }
+                ]
             }
 
             patch(
@@ -197,19 +191,16 @@ def get_bearer_token(event, token):
 
     # Channel Auth Complete
     data = {
-        "type": 4,
-        "data": {
-            "embeds": [
-                {
-                    "title": "GitHub Authentication",
-                    "description": f"You're Authenticated!\n\nPlease Wait...",
-                    "color": 0xFFFFFF,
-                    "thumbnail": {
-                        "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
-                    },
-                }
-            ]
-        },
+        "embeds": [
+            {
+                "title": "GitHub Authentication",
+                "description": f"You're Authenticated!\n\nPlease Wait...",
+                "color": 0xFFFFFF,
+                "thumbnail": {
+                    "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                },
+            }
+        ]
     }
 
     patch(
@@ -275,13 +266,11 @@ def lambda_processor(event, context):
         ]
     }
 
-    token = patch(
+    patch(
         url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
         json=data,
         headers=discord_headers,
-    ).json()
-
-    print(token)
+    )
 
     # Authenticate User
     bearer_token, user = get_bearer_token(event, token)
@@ -305,19 +294,16 @@ def lambda_processor(event, context):
         print(webhook)
     except:
         data = {
-            "type": 4,
-            "data": {
-                "embeds": [
-                    {
-                        "title": "Discord Error",
-                        "description": f"Discord channel <#{channel}> can only have 15 webhooks.",
-                        "color": 0xBD2C00,
-                        "thumbnail": {
-                            "url": "https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6cc3c481a15a141738_icon_clyde_white_RGB.png",
-                        },
-                    }
-                ]
-            },
+            "embeds": [
+                {
+                    "title": "Discord Error",
+                    "description": f"Discord channel <#{channel}> can only have 15 webhooks.",
+                    "color": 0xBD2C00,
+                    "thumbnail": {
+                        "url": "https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6cc3c481a15a141738_icon_clyde_white_RGB.png",
+                    },
+                }
+            ]
         }
 
         patch(
@@ -365,19 +351,16 @@ def lambda_processor(event, context):
     if "Validation Failed" in r.__str__():
         delete(url=f"https://discord.com/api/webhooks/{webhook}")
         data = {
-            "type": 4,
-            "data": {
-                "embeds": [
-                    {
-                        "title": "GitHub Error",
-                        "description": f"{r['errors'][0]['message']}\n\n[Check your GitHub Repo's Webhook Settings](https://github.com/{owner}/{repo}/settings/hooks)",
-                        "color": 0xBD2C00,
-                        "thumbnail": {
-                            "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
-                        },
-                    }
-                ]
-            },
+            "embeds": [
+                {
+                    "title": "GitHub Error",
+                    "description": f"{r['errors'][0]['message']}\n\n[Check your GitHub Repo's Webhook Settings](https://github.com/{owner}/{repo}/settings/hooks)",
+                    "color": 0xBD2C00,
+                    "thumbnail": {
+                        "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                    },
+                }
+            ]
         }
 
         patch(
@@ -394,19 +377,16 @@ def lambda_processor(event, context):
         # Nonexistent Repo
         if get(f"https://github.com/{owner}/{repo}").status_code == 404:
             data = {
-                "type": 4,
-                "data": {
-                    "embeds": [
-                        {
-                            "title": "Access Error",
-                            "description": f"Repo [`{owner}/{repo}`](https://github.com/{owner}/{repo})\nis inaccessible or does not exist",
-                            "color": 0xBD2C00,
-                            "thumbnail": {
-                                "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
-                            },
-                        }
-                    ]
-                },
+                "embeds": [
+                    {
+                        "title": "Access Error",
+                        "description": f"Repo [`{owner}/{repo}`](https://github.com/{owner}/{repo})\nis inaccessible or does not exist",
+                        "color": 0xBD2C00,
+                        "thumbnail": {
+                            "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                        },
+                    }
+                ]
             }
 
             patch(
@@ -446,19 +426,16 @@ def lambda_processor(event, context):
     # GitHub Webhook Created
     if "created_at" in r.__str__():
         data = {
-            "type": 4,
-            "data": {
-                "embeds": [
-                    {
-                        "title": "GitHub",
-                        "description": f"<#{channel}>\nSubscribed to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
-                        "color": 0xFFFFFF,
-                        "thumbnail": {
-                            "url": f"https://github.com/{owner}.png",
-                        },
-                    }
-                ]
-            },
+            "embeds": [
+                {
+                    "title": "GitHub",
+                    "description": f"<#{channel}>\nSubscribed to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                    "color": 0xFFFFFF,
+                    "thumbnail": {
+                        "url": f"https://github.com/{owner}.png",
+                    },
+                }
+            ]
         }
 
         patch(
