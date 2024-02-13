@@ -284,11 +284,12 @@ def lambda_processor(event, context):
         },
     }
 
-    patch(
+    r = patch(
         url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
         data=data,
         headers=discord_headers,
     )
+    print(r)
 
     # Authenticate User
     bearer_token, user = get_bearer_token(event)
