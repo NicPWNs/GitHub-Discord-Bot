@@ -268,7 +268,7 @@ def lambda_processor(event, context):
         "embeds": [
             {
                 "title": "GitHub",
-                "description": f"<#{channel}> Subscribing to {subscription}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                "description": f"<#{channel}> Subscribing to **{subscription}**\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
                 "color": 0xFFFFFF,
                 "thumbnail": {
                     "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
@@ -443,7 +443,7 @@ def lambda_processor(event, context):
             "embeds": [
                 {
                     "title": "GitHub",
-                    "description": f"<#{channel}>\nSubscribed to {subscription}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                    "description": f"<#{channel}>\nSubscribed to **{subscription}**\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
                     "color": 0xFFFFFF,
                     "thumbnail": {
                         "url": f"https://github.com/{owner}.png",

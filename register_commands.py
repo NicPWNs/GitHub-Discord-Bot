@@ -10,21 +10,21 @@ DISCORD_TOKEN = getenv("DISCORD_TOKEN")
 # Discord Auth
 headers = {"Authorization": f"Bot {DISCORD_TOKEN}"}
 
-# /gh Command
+# `/github {repo} {events}` Command
 json = {
-    "name": "gh",
+    "name": "github",
     "type": 1,
-    "description": "Subscribe to a GitHub repository in this channel.",
+    "description": "Subscribe to GitHub repository events in this channel.",
     "options": [
         {
-            "name": "repository",
-            "description": "GitHub repo URL or USERNAME/REPO format.",
+            "name": "repo",
+            "description": "Repo URL or {USERNAME}/{REPO} format.",
             "type": 3,
             "required": True,
         },
         {
             "name": "events",
-            "description": "Event(s) to subscribe to.",
+            "description": "Events to subscribe this channel to.",
             "type": 3,
             "required": True,
             "choices": [
@@ -55,14 +55,14 @@ json = {
 }
 
 # Register Commands
-r = post(
-    f"https://discord.com/api/v10/applications/{DISCORD_APP_ID}/commands",
+response = post(
+    f"https://discord.com/api/applications/{DISCORD_APP_ID}/commands",
     headers=headers,
     json=json,
 )
 
 # Status
-if int(r.status_code) == 200:
-    print("Commands Registration Succeeded!")
+if int(response.status_code) == 200:
+    print("Command Registration Succeeded!")
 else:
-    print(f"Command Registration Failed: {r.json()}")
+    print(f"Command Registration Failed: {response.json()}")
