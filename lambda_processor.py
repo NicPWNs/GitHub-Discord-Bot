@@ -252,6 +252,9 @@ def lambda_processor(event, context):
     channel = event["channel_id"]
     application = event["application_id"]
     token = event["token"]
+    subscription = list(event_options.keys())[
+        list(event_options.values()).index(events)
+    ]
 
     # Extract Repo and Owner
     repo_search = search(r"[\/\/]*[github\.com]*[\/]*([\w.-]+)\/([\w.-]+)", repository)
@@ -261,12 +264,11 @@ def lambda_processor(event, context):
         repo = repo_search.group(2)
 
     # Begin Process
-    # TODO: Fix events
     data = {
         "embeds": [
             {
                 "title": "GitHub",
-                "description": f"<#{channel}> Subscribing to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                "description": f"<#{channel}> Subscribing to {subscription}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
                 "color": 0xFFFFFF,
                 "thumbnail": {
                     "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
@@ -289,7 +291,6 @@ def lambda_processor(event, context):
     repo_clean = sub(r"(?i)clyde", "clyd*", repo)
 
     # Discord Webhook Avatar
-    # TODO: Image Data: https://discord.com/developers/docs/reference#image-data
     image = open("./github.png", "rb").read()
     base64 = b64encode(image).decode("utf-8")
     avatar = f"data:image/png;base64,{base64}"
