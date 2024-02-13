@@ -269,27 +269,23 @@ def lambda_processor(event, context):
 
     # Begin Process
     data = {
-        "type": 4,
-        "data": {
-            "embeds": [
-                {
-                    "title": "GitHub",
-                    "description": f"<#{channel}> Subscribing to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
-                    "color": 0xFFFFFF,
-                    "thumbnail": {
-                        "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
-                    },
-                }
-            ]
-        },
+        "embeds": [
+            {
+                "title": "GitHub",
+                "description": f"<#{channel}> Subscribing to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                "color": 0xFFFFFF,
+                "thumbnail": {
+                    "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                },
+            }
+        ]
     }
 
     r = patch(
         url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
         data=data,
         headers=discord_headers,
-    ).json()
-    print(r)
+    )
 
     # Authenticate User
     bearer_token, user = get_bearer_token(event)
