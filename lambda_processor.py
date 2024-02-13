@@ -281,6 +281,8 @@ def lambda_processor(event, context):
         ]
     }
 
+    print(f"Application: {application}")
+    print(f"Token: {token}")
     r = patch(
         url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
         data=data,
