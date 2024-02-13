@@ -14,8 +14,9 @@ GITHUB_CLIENT = getenv("GITHUB_CLIENT")
 DISCORD_TOKEN = getenv("DISCORD_TOKEN")
 
 
-# Discord Auth Headers
+# Headers
 discord_headers = {"Authorization": f"Bot {DISCORD_TOKEN}"}
+json_headers = {"Accept": "application/json"}
 
 
 # Authentication Timeout
@@ -58,8 +59,9 @@ def get_device_code(dm_channel):
 
     data = {"client_id": GITHUB_CLIENT, "scope": "admin:repo_hook"}
 
-    r = post(url="https://github.com/login/device/code", json=data).json()
-    print(r)
+    r = post(
+        url="https://github.com/login/device/code", json=data, headers=json_headers
+    ).json()
 
     device_code = r["device_code"]
 
@@ -146,6 +148,7 @@ def get_bearer_token(event, token):
         r = post(
             url="https://github.com/login/oauth/access_token",
             json=data,
+            headers=json_headers,
         ).json()
         if "slow_down" in r:
             interval = int(r["interval"])
