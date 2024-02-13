@@ -238,8 +238,8 @@ def lambda_processor(event, context):
     event = loads(event["Records"][0]["body"])
 
     # Interaction Context
-    repository = event["data"]["options"][0]["value"]
-    events = repository = event["data"]["options"][1]["value"]
+    repository = event["data"]["options"][1]["value"]
+    events = repository = event["data"]["options"][0]["value"]
     interaction = event["data"]["id"]
     application = event["application_id"]
     token = event["token"]
