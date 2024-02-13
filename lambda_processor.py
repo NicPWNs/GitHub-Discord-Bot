@@ -239,7 +239,10 @@ def get_bearer_token(event, token):
 def lambda_processor(event, context):
 
     # Deserialize SQS Event
-    event = loads(event["Records"][0]["body"])
+    try:
+        event = loads(event["Records"][0]["body"])
+    except KeyError:
+        pass
 
     # Interaction Context
     repository = event["data"]["options"][0]["value"]
