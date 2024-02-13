@@ -86,11 +86,10 @@ def get_device_code(dm_channel):
 
 
 # Get Access Token for GitHub Webhook Creation
-def get_bearer_token(event):
+def get_bearer_token(event, token):
 
     bearer_token = ""
     application = event["application_id"]
-    token = event["token"]
     channel = event["channel_id"]
     discord_user = event["member"]["user"]["global_name"]
     discord_user_id = event["member"]["user"]["id"]
@@ -132,7 +131,6 @@ def get_bearer_token(event):
     else:
         bearer_token = data["Item"]["bearer_token"]
         user = data["Item"]["github_user"]
-        print(f"HELLO {bearer_token}{user}")
         return bearer_token, user
 
     data = {
@@ -277,14 +275,16 @@ def lambda_processor(event, context):
         ]
     }
 
-    patch(
+    token = patch(
         url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
         json=data,
         headers=discord_headers,
-    )
+    ).json()["token"]
+
+    print(token)
 
     # Authenticate User
-    bearer_token, user = get_bearer_token(event)
+    bearer_token, user = get_bearer_token(event, token)
 
     # Clean Repo Name
     repo_clean = sub(r"(?i)discord", "disc*rd", repo)
@@ -301,7 +301,7 @@ def lambda_processor(event, context):
             url=f"https://discord.com/api/channels/{channel}/webhooks",
             json=data,
             headers=discord_headers,
-        )
+        ).json()["id"]
         print(webhook)
     except:
         data = {
