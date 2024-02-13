@@ -102,7 +102,7 @@ def get_bearer_token(event, token):
             url="https://discord.com/api/users/@me/channels",
             json=data,
             headers=discord_headers,
-        )
+        ).json()["channel_id"]
 
         # Channel Auth Begin
         data = {
@@ -340,7 +340,6 @@ def lambda_processor(event, context):
         headers=github_headers,
         json=data,
     ).json()
-    print(r)
 
     # Invalid Authentication
     if "Bad credentials" in r.__str__():
