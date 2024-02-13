@@ -247,6 +247,8 @@ def lambda_processor(event, context):
     discord_user = event["member"]["user"]["global_name"]
     discord_user_id = event["member"]["user"]["id"]
 
+    print(repository)
+
     # Extract Repo and Owner
     repo_search = search(r"[\/\/]*[github\.com]*[\/]*([\w.-]+)\/([\w.-]+)", repository)
 
