@@ -290,7 +290,7 @@ def lambda_processor(event, context):
             url=f"https://discord.com/api/channels/{channel}/webhooks",
             json=data,
             headers=discord_headers,
-        ).json()["id"]
+        ).json()
         print(webhook)
     except:
         data = {
