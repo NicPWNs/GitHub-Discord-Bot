@@ -131,7 +131,7 @@ def get_bearer_token(event):
             headers=discord_headers,
         )
 
-        device_code, dm_message = await get_device_code(dm_channel)
+        device_code, dm_message = get_device_code(dm_channel)
     else:
         bearer_token = data["Item"]["bearer_token"]
         user = data["Item"]["github_user"]
