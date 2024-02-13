@@ -1,4 +1,5 @@
 from os import getenv
+from json import loads
 from boto3 import resource
 from re import search, sub
 from time import time, sleep
@@ -233,11 +234,8 @@ async def get_bearer_token(event):
 # Lambda Executes
 def lambda_processor(event, context):
 
-    # Decapsulate Event
-    event = event["Records"][0]["body"]
-
-    print(event)
-    print(type(event))
+    # Deserialize SQS Event
+    event = loads(event["Records"][0]["body"])
 
     # Interaction Context
     repository = event["data"]["options"][0]["value"]
