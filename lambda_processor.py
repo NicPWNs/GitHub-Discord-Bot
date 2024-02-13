@@ -290,7 +290,9 @@ def lambda_processor(event, context):
             url=f"https://discord.com/api/channels/{channel}/webhooks",
             json=data,
             headers=discord_headers,
-        ).json()["id"]
+        ).json()
+        webhook_id = webhook["id"]
+        webhook_url = webhook["url"]
     except:
         data = {
             "embeds": [
@@ -328,7 +330,7 @@ def lambda_processor(event, context):
 
     data = {
         "name": "web",
-        "config": {"url": webhook.url + "/github", "content_type": "json"},
+        "config": {"url": webhook_url + "/github", "content_type": "json"},
         "events": event_list,
         "active": True,
     }
@@ -338,17 +340,18 @@ def lambda_processor(event, context):
         headers=github_headers,
         data=data,
     ).json()
+    print(r)
 
     # Invalid Authentication
     if "Bad credentials" in r.__str__():
-        delete(url=f"https://discord.com/api/webhooks/{webhook}")
+        delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
         table.delete_item(Key={"id": str(discord_user_id)})
         lambda_processor(event, context)
         return
 
     # GitHub Error
     if "Validation Failed" in r.__str__():
-        delete(url=f"https://discord.com/api/webhooks/{webhook}")
+        delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
         data = {
             "embeds": [
                 {
@@ -372,7 +375,7 @@ def lambda_processor(event, context):
 
     # Other Errors
     if "Not Found" in r.__str__():
-        delete(url=f"https://discord.com/api/webhooks/{webhook}")
+        delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
         # Nonexistent Repo
         if get(f"https://github.com/{owner}/{repo}").status_code == 404:
             data = {
