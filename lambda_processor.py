@@ -3,6 +3,7 @@ from json import loads
 from boto3 import resource
 from re import search, sub
 from time import time, sleep
+from base64 import b64encode
 from requests import get, patch, post, delete
 from dotenv import load_dotenv
 
@@ -288,10 +289,13 @@ def lambda_processor(event, context):
 
     # Discord Webhook Avatar
     # TODO: Image Data: https://discord.com/developers/docs/reference#image-data
+    image = open("./github.png", "rb").read()
+    base64 = b64encode(image).decode("utf-8")
+    avatar = f"data:image/png;base64,{base64}"
 
     # Create Discord Webhook
     try:
-        data = {"name": f"{repo_clean} GitHub {events}"}
+        data = {"name": f"{repo_clean} GitHub {events}", "avatar": avatar}
 
         webhook = post(
             url=f"https://discord.com/api/channels/{channel}/webhooks",
