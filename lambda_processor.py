@@ -338,7 +338,7 @@ def lambda_processor(event, context):
     r = post(
         f"https://api.github.com/repos/{owner}/{repo}/hooks",
         headers=github_headers,
-        data=data,
+        json=data,
     ).json()
     print(r)
 
