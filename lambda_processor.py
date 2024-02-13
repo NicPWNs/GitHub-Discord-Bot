@@ -240,7 +240,7 @@ def lambda_processor(event, context):
     # Interaction Context
     repository = event["data"]["options"][0]["value"]
     events = repository = event["data"]["options"][1]["value"]
-    subscription = event_options.index(events)
+    subscription = event_options.keys()[event_options.values().index(events)]
     interaction = event["data"]["id"]
     application = event["application_id"]
     token = event["token"]
