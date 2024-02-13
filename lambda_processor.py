@@ -60,7 +60,7 @@ def get_device_code(dm_channel):
     data = {"client_id": GITHUB_CLIENT, "scope": "admin:repo_hook"}
 
     r = post(
-        url="https://github.com/login/device/code", data=data, headers=json_headers
+        url="https://github.com/login/device/code", json=data, headers=json_headers
     ).json()
 
     device_code = r["device_code"]
@@ -81,7 +81,7 @@ def get_device_code(dm_channel):
 
     dm_message = post(
         url=f"https://discord.com/api/channels/{dm_channel}/messages",
-        data=data,
+        json=data,
         headers=discord_headers,
     )
 
@@ -104,7 +104,7 @@ def get_bearer_token(event):
         data = {"recipient_id": discord_user_id}
         dm_channel = post(
             url="https://discord.com/api/users/@me/channels",
-            data=data,
+            json=data,
             headers=discord_headers,
         )
 
@@ -127,7 +127,7 @@ def get_bearer_token(event):
 
         patch(
             url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-            data=data,
+            json=data,
             headers=discord_headers,
         )
 
@@ -151,7 +151,7 @@ def get_bearer_token(event):
         sleep(interval)
         r = post(
             url="https://github.com/login/oauth/access_token",
-            data=data,
+            json=data,
             headers=json_headers,
         ).json()
         if "slow_down" in r:
@@ -177,7 +177,7 @@ def get_bearer_token(event):
 
             patch(
                 url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-                data=data,
+                json=data,
                 headers=discord_headers,
             )
 
@@ -196,7 +196,7 @@ def get_bearer_token(event):
 
     patch(
         url=f"/channels/{dm_channel}/messages/{dm_message}",
-        data=data,
+        json=data,
         headers=discord_headers,
     )
 
@@ -219,7 +219,7 @@ def get_bearer_token(event):
 
     patch(
         url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-        data=data,
+        json=data,
         headers=discord_headers,
     )
 
@@ -253,7 +253,7 @@ def lambda_processor(event, context):
 
     # Interaction Context
     repository = event["data"]["options"][1]["value"]
-    events = repository = event["data"]["options"][0]["value"]
+    events = event["data"]["options"][0]["value"]
     application = event["application_id"]
     token = event["token"]
     channel = event["channel_id"]
@@ -302,7 +302,7 @@ def lambda_processor(event, context):
 
         webhook = post(
             url=f"https://discord.com/api/channels/{channel}/webhooks",
-            data=data,
+            json=data,
             headers=discord_headers,
         )
 
@@ -325,7 +325,7 @@ def lambda_processor(event, context):
 
         patch(
             url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-            data=data,
+            json=data,
             headers=discord_headers,
         )
 
@@ -385,7 +385,7 @@ def lambda_processor(event, context):
 
         patch(
             url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-            data=data,
+            json=data,
             headers=discord_headers,
         )
 
@@ -414,7 +414,7 @@ def lambda_processor(event, context):
 
             patch(
                 url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-                data=data,
+                json=data,
                 headers=discord_headers,
             )
 
@@ -440,7 +440,7 @@ def lambda_processor(event, context):
 
             patch(
                 url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-                data=data,
+                json=data,
                 headers=discord_headers,
             )
 
@@ -466,7 +466,7 @@ def lambda_processor(event, context):
 
         patch(
             url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-            data=data,
+            json=data,
             headers=discord_headers,
         )
 

@@ -1,5 +1,4 @@
 python-dotenv
 requests
-py-cord
 pynacl
 boto3
