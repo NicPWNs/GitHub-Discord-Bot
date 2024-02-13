@@ -58,7 +58,8 @@ def get_device_code(dm_channel):
 
     data = {"client_id": GITHUB_CLIENT, "scope": "admin:repo_hook"}
 
-    r = post(url="https://github.com/login/device/code", json=data).json()
+    r = post(url="https://github.com/login/device/code", json=data)
+    print(r)
 
     device_code = r["device_code"]
 
