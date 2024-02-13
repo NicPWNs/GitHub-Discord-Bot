@@ -237,6 +237,7 @@ def lambda_processor(event, context):
     event = event["Records"][0]["body"]
 
     print(event)
+    print(type(event))
 
     # Interaction Context
     repository = event["data"]["options"][0]["value"]
