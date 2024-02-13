@@ -102,8 +102,7 @@ def get_bearer_token(event, token):
             url="https://discord.com/api/users/@me/channels",
             json=data,
             headers=discord_headers,
-        ).json()
-        print(dm_channel)
+        ).json()["id"]
 
         # Channel Auth Begin
         data = {
