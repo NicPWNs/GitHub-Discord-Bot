@@ -14,7 +14,7 @@ GITHUB_CLIENT = getenv("GITHUB_CLIENT")
 DISCORD_TOKEN = getenv("DISCORD_TOKEN")
 
 
-# Headers
+# Discord Auth Headers
 discord_headers = {"Authorization": f"Bot {DISCORD_TOKEN}"}
 
 
@@ -248,12 +248,12 @@ def lambda_processor(event, context):
     event = loads(event["Records"][0]["body"])
 
     # Interaction Context
-    repository = event["data"]["options"][1]["value"]
-    events = event["data"]["options"][0]["value"]
+    repository = event["data"]["options"][0]["value"]
+    events = event["data"]["options"][1]["value"]
+    discord_user_id = event["member"]["user"]["id"]
+    channel = event["channel_id"]
     application = event["application_id"]
     token = event["token"]
-    channel = event["channel_id"]
-    discord_user_id = event["member"]["user"]["id"]
 
     # Extract Repo and Owner
     repo_search = search(r"[\/\/]*[github\.com]*[\/]*([\w.-]+)\/([\w.-]+)", repository)
