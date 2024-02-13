@@ -130,8 +130,8 @@ def get_bearer_token(event, token):
         device_code, dm_message = get_device_code(dm_channel)
     else:
         bearer_token = data["Item"]["bearer_token"]
-        user = data["Item"]["github_user"]
-        return bearer_token, user
+        github_user = data["Item"]["github_user"]
+        return bearer_token, github_user
 
     data = {
         "client_id": GITHUB_CLIENT,
@@ -232,7 +232,7 @@ def get_bearer_token(event, token):
         }
     )
 
-    return bearer_token, user
+    return bearer_token, github_user
 
 
 # Lambda Executes
@@ -277,7 +277,7 @@ def lambda_processor(event, context):
     )
 
     # Authenticate User
-    bearer_token, user = get_bearer_token(event, token)
+    bearer_token, github_user = get_bearer_token(event, token)
 
     # Clean Repo Name
     repo_clean = sub(r"(?i)discord", "disc*rd", repo)
@@ -410,7 +410,7 @@ def lambda_processor(event, context):
                     "embeds": [
                         {
                             "title": "Permission Error",
-                            "description": f"GitHub user `{user}` can't create webhooks\non [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                            "description": f"GitHub user `{github_user}` can't create webhooks\non [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
                             "color": 0xBD2C00,
                             "thumbnail": {
                                 "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
