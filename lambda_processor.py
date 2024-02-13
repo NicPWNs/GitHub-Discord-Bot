@@ -254,7 +254,6 @@ def lambda_processor(event, context):
     # Interaction Context
     repository = event["data"]["options"][1]["value"]
     events = repository = event["data"]["options"][0]["value"]
-    interaction = event["data"]["id"]
     application = event["application_id"]
     token = event["token"]
     channel = event["channel_id"]
@@ -281,11 +280,9 @@ def lambda_processor(event, context):
         ]
     }
 
-    print(f"Application: {application}")
-    print(f"Token: {token}")
-    r = patch(
+    patch(
         url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-        data=data,
+        json=data,
         headers=discord_headers,
     )
 
