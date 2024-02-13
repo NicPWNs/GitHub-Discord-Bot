@@ -233,6 +233,9 @@ async def get_bearer_token(event):
 # Lambda Executes
 def lambda_processor(event, context):
 
+    # Decapsulate Event
+    event = event["Records"][0]["body"]
+
     print(event)
 
     # Interaction Context
