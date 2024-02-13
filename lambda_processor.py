@@ -279,7 +279,7 @@ def lambda_processor(event, context):
         url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
         json=data,
         headers=discord_headers,
-    ).json()["token"]
+    ).json()
 
     print(token)
 
