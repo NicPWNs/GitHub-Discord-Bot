@@ -55,7 +55,7 @@ event_options = {
 
 
 # Authorize OAuth App with Device Flow
-async def get_device_code(dm_channel):
+def get_device_code(dm_channel):
 
     data = {"client_id": GITHUB_CLIENT, "scope": "admin:repo_hook"}
 
@@ -89,7 +89,7 @@ async def get_device_code(dm_channel):
 
 
 # Get Access Token for GitHub Webhook Creation
-async def get_bearer_token(event):
+def get_bearer_token(event):
 
     bearer_token = ""
     application = event["application_id"]
