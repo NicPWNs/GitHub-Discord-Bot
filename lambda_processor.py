@@ -277,6 +277,7 @@ def lambda_processor(event, context):
 
     # Clean Repo Name
     repo_clean = sub(r"(?i)discord", "disc*rd", repo)
+    repo_clean = sub(r"(?i)clyde", "clyd*", repo)
 
     # Discord Webhook Avatar
     with open("github.png", "rb") as image:
@@ -289,7 +290,7 @@ def lambda_processor(event, context):
         url=f"https://discord.com/api/channels/{channel}/webhooks",
         json=data,
         headers=discord_headers,
-    ).json()
+    )
     print(webhook)
     """
         data = {
