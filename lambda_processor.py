@@ -240,7 +240,6 @@ def lambda_processor(event, context):
     # Interaction Context
     repository = event["data"]["options"][0]["value"]
     events = repository = event["data"]["options"][1]["value"]
-    subscription = event_options.keys()[event_options.values().index(events)]
     interaction = event["data"]["id"]
     application = event["application_id"]
     token = event["token"]
@@ -262,7 +261,7 @@ def lambda_processor(event, context):
             "embeds": [
                 {
                     "title": "GitHub",
-                    "description": f"<#{channel}> Subscribing to {subscription}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                    "description": f"<#{channel}> Subscribing to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
                     "color": 0xFFFFFF,
                     "thumbnail": {
                         "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
