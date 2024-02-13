@@ -297,7 +297,7 @@ def lambda_processor(event, context):
 
     # Create Discord Webhook
     try:
-        data = {"name": f"{repo_clean} GitHub {events}", "avatar": avatar}
+        data = {"name": f"{repo_clean} GitHub {subscription}", "avatar": avatar}
 
         webhook = post(
             url=f"https://discord.com/api/channels/{channel}/webhooks",
@@ -443,7 +443,7 @@ def lambda_processor(event, context):
             "embeds": [
                 {
                     "title": "GitHub",
-                    "description": f"<#{channel}>\nSubscribed to {events}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                    "description": f"<#{channel}>\nSubscribed to {subscription}\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
                     "color": 0xFFFFFF,
                     "thumbnail": {
                         "url": f"https://github.com/{owner}.png",
