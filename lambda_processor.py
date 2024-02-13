@@ -188,7 +188,7 @@ def get_bearer_token(event, token):
     }
 
     patch(
-        url=f"/channels/{dm_channel}/messages/{dm_message}",
+        url=f"https://discord.com/api/channels/{dm_channel}/messages/{dm_message}",
         json=data,
         headers=discord_headers,
     )
