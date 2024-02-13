@@ -14,6 +14,11 @@ GITHUB_CLIENT = getenv("GITHUB_CLIENT")
 DISCORD_TOKEN = getenv("DISCORD_TOKEN")
 
 
+# Headers
+json_headers = {"Accept": "application/json"}
+discord_headers = {"Authorization": f"Bot {DISCORD_TOKEN}"}
+
+
 # Authentication Timeout
 class TimeoutError(Exception):
     pass
@@ -52,12 +57,10 @@ event_options = {
 # Authorize OAuth App with Device Flow
 async def get_device_code(dm_channel):
 
-    headers = {"Accept": "application/json"}
-
     data = {"client_id": GITHUB_CLIENT, "scope": "admin:repo_hook"}
 
     r = post(
-        url="https://github.com/login/device/code", data=data, headers=headers
+        url="https://github.com/login/device/code", data=data, headers=json_headers
     ).json()
 
     device_code = r["device_code"]
@@ -77,7 +80,9 @@ async def get_device_code(dm_channel):
     }
 
     dm_message = post(
-        url=f"https://discord.com/api/channels/{dm_channel}/messages", data=data
+        url=f"https://discord.com/api/channels/{dm_channel}/messages",
+        data=data,
+        headers=discord_headers,
     )
 
     return device_code, dm_message
@@ -97,7 +102,11 @@ async def get_bearer_token(event):
 
     if int(data["ResponseMetadata"]["HTTPHeaders"]["content-length"]) < 5:
         data = {"recipient_id": discord_user_id}
-        dm_channel = post(url="https://discord.com/api/users/@me/channels", data=data)
+        dm_channel = post(
+            url="https://discord.com/api/users/@me/channels",
+            data=data,
+            headers=discord_headers,
+        )
 
         # Channel Auth Begin
         data = {
@@ -119,6 +128,7 @@ async def get_bearer_token(event):
         patch(
             url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
             data=data,
+            headers=discord_headers,
         )
 
         device_code, dm_message = await get_device_code(dm_channel)
@@ -126,8 +136,6 @@ async def get_bearer_token(event):
         bearer_token = data["Item"]["bearer_token"]
         user = data["Item"]["github_user"]
         return bearer_token, user
-
-    headers = {"Accept": "application/json"}
 
     data = {
         "client_id": GITHUB_CLIENT,
@@ -144,7 +152,7 @@ async def get_bearer_token(event):
         r = post(
             url="https://github.com/login/oauth/access_token",
             data=data,
-            headers=headers,
+            headers=json_headers,
         ).json()
         if "slow_down" in r:
             interval = int(r["interval"])
@@ -170,6 +178,7 @@ async def get_bearer_token(event):
             patch(
                 url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
                 data=data,
+                headers=discord_headers,
             )
 
             raise TimeoutError
@@ -185,7 +194,11 @@ async def get_bearer_token(event):
         ]
     }
 
-    patch(url=f"/channels/{dm_channel}/messages/{dm_message}", data=data)
+    patch(
+        url=f"/channels/{dm_channel}/messages/{dm_message}",
+        data=data,
+        headers=discord_headers,
+    )
 
     # Channel Auth Complete
     data = {
@@ -207,14 +220,15 @@ async def get_bearer_token(event):
     patch(
         url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
         data=data,
+        headers=discord_headers,
     )
 
     # GitHub Username
-    headers = {
+    github_headers = {
         "Accept": "application/vnd.github+json",
         "Authorization": "Bearer " + bearer_token,
     }
-    github_user = get(url="https://api.github.com/user", headers=headers).json()[
+    github_user = get(url="https://api.github.com/user", headers=github_headers).json()[
         "login"
     ]
 
@@ -244,10 +258,7 @@ def lambda_processor(event, context):
     application = event["application_id"]
     token = event["token"]
     channel = event["channel_id"]
-    discord_user = event["member"]["user"]["global_name"]
     discord_user_id = event["member"]["user"]["id"]
-
-    print(repository)
 
     # Extract Repo and Owner
     repo_search = search(r"[\/\/]*[github\.com]*[\/]*([\w.-]+)\/([\w.-]+)", repository)
@@ -276,12 +287,11 @@ def lambda_processor(event, context):
     patch(
         url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
         data=data,
+        headers=discord_headers,
     )
 
     # Authenticate User
-    bearer_token, user = get_bearer_token(
-        discord_user, discord_user_id, channel, interaction
-    )
+    bearer_token, user = get_bearer_token(event)
 
     # Clean Repo Name
     repo_clean = sub(r"(?i)discord", "disc*rd", repo)
@@ -295,7 +305,9 @@ def lambda_processor(event, context):
         data = {"name": f"{repo_clean} GitHub {events}", "avatar": avatar}
 
         webhook = post(
-            url=f"https://discord.com/api/channels/{channel}/webhooks", data=data
+            url=f"https://discord.com/api/channels/{channel}/webhooks",
+            data=data,
+            headers=discord_headers,
         )
 
     except:
@@ -318,6 +330,7 @@ def lambda_processor(event, context):
         patch(
             url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
             data=data,
+            headers=discord_headers,
         )
 
         return
@@ -330,7 +343,7 @@ def lambda_processor(event, context):
         event_list = [events]
 
     # Create GitHub Webhook
-    headers = {
+    github_headers = {
         "Accept": "application/vnd.github+json",
         "Authorization": "Bearer " + bearer_token,
     }
@@ -344,7 +357,7 @@ def lambda_processor(event, context):
 
     r = post(
         f"https://api.github.com/repos/{owner}/{repo}/hooks",
-        headers=headers,
+        headers=github_headers,
         json=data,
     ).json()
 
@@ -377,6 +390,7 @@ def lambda_processor(event, context):
         patch(
             url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
             data=data,
+            headers=discord_headers,
         )
 
         return
@@ -405,6 +419,7 @@ def lambda_processor(event, context):
             patch(
                 url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
                 data=data,
+                headers=discord_headers,
             )
 
             return
@@ -430,6 +445,7 @@ def lambda_processor(event, context):
             patch(
                 url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
                 data=data,
+                headers=discord_headers,
             )
 
             return
@@ -455,6 +471,7 @@ def lambda_processor(event, context):
         patch(
             url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
             data=data,
+            headers=discord_headers,
         )
 
     return
