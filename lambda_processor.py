@@ -280,19 +280,18 @@ def lambda_processor(event, context):
     repo_clean = sub(r"(?i)clyde", "clyd*", repo)
 
     # Discord Webhook Avatar
-    with open("github.png", "rb") as image:
-        avatar = bytearray(image.read())
+    # TODO: Image Data: https://discord.com/developers/docs/reference#image-data
 
     # Create Discord Webhook
-    data = {"name": f"{repo_clean} GitHub {events}", "avatar": avatar}
+    try:
+        data = {"name": f"{repo_clean} GitHub {events}"}
 
-    webhook = post(
-        url=f"https://discord.com/api/channels/{channel}/webhooks",
-        json=data,
-        headers=discord_headers,
-    )
-    print(webhook)
-    """
+        webhook = post(
+            url=f"https://discord.com/api/channels/{channel}/webhooks",
+            json=data,
+            headers=discord_headers,
+        ).json()["id"]
+    except:
         data = {
             "embeds": [
                 {
@@ -313,7 +312,7 @@ def lambda_processor(event, context):
         )
 
         return
-    """
+
     # All Events
     if events == "all":
         event_list = list(event_options.values())
