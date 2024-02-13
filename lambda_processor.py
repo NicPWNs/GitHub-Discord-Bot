@@ -351,7 +351,7 @@ def lambda_processor(event, context):
     r = post(
         f"https://api.github.com/repos/{owner}/{repo}/hooks",
         headers=github_headers,
-        json=data,
+        data=data,
     ).json()
 
     # Invalid Authentication
