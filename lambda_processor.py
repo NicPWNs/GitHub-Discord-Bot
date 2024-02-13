@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 
 # Load Secrets
 load_dotenv()
-TABLE = getenv("DDB_TABLE")
-GITHUB = getenv("GITHUB_CLIENT")
-DISCORD = getenv("DISCORD_TOKEN")
+DDB_TABLE = getenv("DDB_TABLE")
+GITHUB_CLIENT = getenv("GITHUB_CLIENT")
+DISCORD_TOKEN = getenv("DISCORD_TOKEN")
 
 
 # Authentication Timeout
@@ -19,7 +19,7 @@ class TimeoutError(Exception):
 
 
 # AWS DynamoDB Config
-table = resource("dynamodb").Table(TABLE)
+table = resource("dynamodb").Table(DDB_TABLE)
 
 
 # Event Options
@@ -53,7 +53,7 @@ async def get_device_code(dm_channel):
 
     headers = {"Accept": "application/json"}
 
-    data = {"client_id": GITHUB, "scope": "admin:repo_hook"}
+    data = {"client_id": GITHUB_CLIENT, "scope": "admin:repo_hook"}
 
     r = post(
         url="https://github.com/login/device/code", data=data, headers=headers
@@ -129,7 +129,7 @@ async def get_bearer_token(event):
     headers = {"Accept": "application/json"}
 
     data = {
-        "client_id": GITHUB,
+        "client_id": GITHUB_CLIENT,
         "device_code": device_code,
         "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
     }
@@ -232,6 +232,8 @@ async def get_bearer_token(event):
 
 # Lambda Executes
 def lambda_processor(event, context):
+
+    print(event)
 
     # Interaction Context
     repository = event["data"]["options"][0]["value"]
