@@ -435,19 +435,16 @@ def lambda_processor(event, context):
         # Permission Error
         else:
             data = {
-                "type": 4,
-                "data": {
-                    "embeds": [
-                        {
-                            "title": "Permission Error",
-                            "description": f"GitHub user `{github_user}` can't create webhooks\non [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
-                            "color": 0xBD2C00,
-                            "thumbnail": {
-                                "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
-                            },
-                        }
-                    ]
-                },
+                "embeds": [
+                    {
+                        "title": "Permission Error",
+                        "description": f"GitHub user `{github_user}` can't create webhooks\non [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                        "color": 0xBD2C00,
+                        "thumbnail": {
+                            "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                        },
+                    }
+                ]
             }
 
             patch(
