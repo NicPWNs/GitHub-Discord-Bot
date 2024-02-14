@@ -26,8 +26,6 @@ Subscribe to **All Events** in this repo:
 /github repo:NicPWNs/GitHub-Discord-Bot events:All Events
 ```
 
-[SCREENSHOT]
-
 Subscribe to **Stars** in this repo:
 
 ```bash
