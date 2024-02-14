@@ -26,8 +26,7 @@ Subscribe to **All Events** in *this* repo:
 /github repo:NicPWNs/GitHub-Discord-Bot events:All Events
 ```
 
-![image](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/96f34d91-e8fe-442a-ae5d-90b07dda7046)
-
+![image](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/9a787c88-5717-40a5-adfb-034c064a5a0e)
 
 Subscribe to **Stars** in *this* repo:
 
@@ -35,7 +34,7 @@ Subscribe to **Stars** in *this* repo:
 /github repo:https://github.com/NicPWNs/GitHub-Discord-Bot events:Stars
 ```
 
-![image](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/0b088f4d-d83e-442d-b4b0-bb73af18f417)
+![image](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/4605785c-c0e3-457f-bfc2-4af92b0f4498)
 
 > GitHub URLs or Owner/Repo formats work!
 
