@@ -26,8 +26,6 @@ Subscribe to **All Events** in this repo:
 /github repo:NicPWNs/GitHub-Discord-Bot events:All Events
 ```
 
-![image](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/d60c3ef1-3a42-4e68-82a4-5dc8e1bdb006)
-
 Subscribe to **Stars** in this repo:
 
 ```bash
