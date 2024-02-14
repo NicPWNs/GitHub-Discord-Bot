@@ -20,7 +20,7 @@ Work in Progress 🚧
 - [x] Account for max 15 webhooks (per channel), max 20 (for stars), etc.
 - [x] Migrate to Lambda
 - [x] Fix bad repo input
-- [ ] User's linked GitHub?
+- [x] User's linked GitHub?
 - [x] Check timeout
 - [ ] Duplicate subscriptions
 - [x] Rename command to `/github`

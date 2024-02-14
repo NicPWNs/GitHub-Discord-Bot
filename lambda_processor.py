@@ -285,6 +285,11 @@ def lambda_processor(event, context):
         owner = repo_search.group(1)
         repo = repo_search.group(2)
     else:
+
+        r = get(url=f"https://discord.com/api/channels/{channel}/webhooks").json()
+        webhooks = r
+        print(webhooks)
+
         data = {
             "embeds": [
                 {
