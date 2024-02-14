@@ -344,19 +344,42 @@ def lambda_processor(event, context):
             url=f"https://discord.com/api/channels/{channel}/webhooks",
             headers=discord_headers,
         ).json()
-        webhooks_list = [x["name"] for x in webhooks]
+        webhooks_list = [name["name"] for name in webhooks]
         print(webhooks_list)
 
         webhook_name = f"{owner}/{repo_clean} GitHub {subscription}"
-        data = {"name": webhook_name, "avatar": avatar}
 
-        webhook = post(
-            url=f"https://discord.com/api/channels/{channel}/webhooks",
-            json=data,
-            headers=discord_headers,
-        ).json()
-        webhook_id = webhook["id"]
-        webhook_url = webhook["url"]
+        if webhook_name in webhooks_list:
+            data = {
+                "embeds": [
+                    {
+                        "title": "Input Error",
+                        "description": f"Discord channel <#{channel}> is already subscribed to **{subscription}**\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                        "color": 0xBD2C00,
+                        "thumbnail": {
+                            "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                        },
+                    }
+                ]
+            }
+
+            patch(
+                url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
+                json=data,
+                headers=discord_headers,
+            )
+            return
+
+        else:
+            data = {"name": webhook_name, "avatar": avatar}
+
+            webhook = post(
+                url=f"https://discord.com/api/channels/{channel}/webhooks",
+                json=data,
+                headers=discord_headers,
+            ).json()
+            webhook_id = webhook["id"]
+            webhook_url = webhook["url"]
     except:
         data = {
             "embeds": [
