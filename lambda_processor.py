@@ -285,14 +285,6 @@ def lambda_processor(event, context):
         owner = repo_search.group(1)
         repo = repo_search.group(2)
     else:
-
-        r = get(
-            url=f"https://discord.com/api/channels/{channel}/webhooks",
-            headers=discord_headers,
-        ).json()
-        webhooks = r
-        print(webhooks)
-
         data = {
             "embeds": [
                 {
@@ -347,7 +339,16 @@ def lambda_processor(event, context):
 
     # Create Discord Webhook
     try:
-        data = {"name": f"{repo_clean} GitHub {subscription}", "avatar": avatar}
+        # Current Webhooks
+        webhooks = get(
+            url=f"https://discord.com/api/channels/{channel}/webhooks",
+            headers=discord_headers,
+        ).json()
+        webhooks = [webhook_name["name"] for webhook_name in webhooks]
+        print(webhooks)
+
+        webhook_name = f"{owner}/{repo_clean} GitHub {subscription}"
+        data = {"name": webhook_name, "avatar": avatar}
 
         webhook = post(
             url=f"https://discord.com/api/channels/{channel}/webhooks",
