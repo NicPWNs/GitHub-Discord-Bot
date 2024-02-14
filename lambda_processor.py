@@ -281,6 +281,7 @@ def lambda_processor(event, context):
             json=data,
             headers=discord_headers,
         )
+        return
 
     # Begin Process
     data = {
