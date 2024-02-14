@@ -26,13 +26,16 @@ Subscribe to **All Events** in this repo:
 /github repo:NicPWNs/GitHub-Discord-Bot events:All Events
 ```
 
+![image](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/14d4dc2b-0548-43de-9b1a-b4ce2771bddd)
+
+
 Subscribe to **Stars** in this repo:
 
 ```bash
 /github repo:https://github.com/NicPWNs/GitHub-Discord-Bot events:Stars
 ```
 
-[SCREENSHOT]
+![image](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/0b088f4d-d83e-442d-b4b0-bb73af18f417)
 
 > GitHub URLs or Owner/Repo formats work!
 
