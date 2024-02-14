@@ -8,7 +8,7 @@ Subscribe a Discord Channel to Events in your GitHub Repositories. [Try it now!]
 
 ## Getting Started
 
-First, [click here](https://discord.com/api/oauth2/authorize?client_id=1096576031093174334&permissions=536870912&scope=bot) to add the bot to your Discord server. Once added, use the commands below in a text channel to subscribe to specific GitHub events.
+First, [add the bot](https://discord.com/api/oauth2/authorize?client_id=1096576031093174334&permissions=536870912&scope=bot) to your Discord server. Use the commands below in a text channel to subscribe to specific GitHub events.
 
 ## Commands
 
@@ -55,7 +55,7 @@ This bot requires specific permissions to function properly. The bot only reques
 
 ## License
 
-This project is licensed under the [MIT License]().
+This project is licensed under the [MIT License](./LICENSE).
 
 ## Disclaimer
 

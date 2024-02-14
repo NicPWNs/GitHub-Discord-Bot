@@ -333,7 +333,7 @@ def lambda_processor(event, context):
     repo_clean = sub(r"(?i)clyde", "clyd*", repo)
 
     # Discord Webhook Avatar
-    image = open("./github.png", "rb").read()
+    image = open("./images/github.png", "rb").read()
     base64 = b64encode(image).decode("utf-8")
     avatar = f"data:image/png;base64,{base64}"
 
