@@ -114,7 +114,7 @@ def get_bearer_token(event):
             "embeds": [
                 {
                     "title": "GitHub Authentication",
-                    "description": f"You Need to Authenticate with GitHub\n\nCheck <#{dm_channel}>",
+                    "description": f"You Need to Authenticate with GitHub\n\nCheck DM <#{dm_channel}>",
                     "color": 0xFFFFFF,
                     "thumbnail": {
                         "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
@@ -498,5 +498,5 @@ def lambda_processor(event, context):
         )
         return
 
-    print(f"ERROR: Exited without result: {r}")
+    print(f"[ERROR] Exited without result: {r}")
     return

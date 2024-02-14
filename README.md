@@ -21,8 +21,7 @@ Work in Progress 🚧
 - [x] Migrate to Lambda
 - [x] Fix bad repo input
 - [ ] User's linked GitHub?
-- [ ] Ephemeral?
-- [ ] Check timeout
+- [x] Check timeout
 - [ ] Duplicate subscriptions
 - [x] Rename command to `/github`
 - [ ] Formalize README
