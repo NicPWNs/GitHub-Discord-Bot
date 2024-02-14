@@ -1,45 +1,62 @@
 # GitHub Bot for Discord
 
-Work in Progress 🚧
+Subscribe a Discord Channel to Events in your GitHub Repositories. [Try it now!](https://discord.com/api/oauth2/authorize?client_id=1096576031093174334&permissions=536870912&scope=bot)
 
-## To-Do
+> Like this bot? Give it a [⭐ on GitHub!](https://github.com/NicPWNs/github-discord-bot)
 
-- [x] Initial POC
-- [x] Store Auth Tokens
-- [x] Move auth to DM
-- [x] Handle expired/invalid auth
-- [x] Better RegEx
-- [x] Encrypt tokens
-- [x] Remove stray Interaction option
-- [x] Sub to More Events
-- [x] Handle not finding repo
-- [x] Check if Owner
-- [x] Exit wait for auth after some time
-- [x] Fix Discord Webhook Avatar
-- [x] Fix recursion
-- [x] Account for max 15 webhooks (per channel), max 20 (for stars), etc.
-- [x] Migrate to Lambda
-- [x] Fix bad repo input
-- [x] User's linked GitHub?
-- [x] Check timeout
-- [ ] Duplicate subscriptions
-- [x] Rename command to `/github`
-- [ ] Formalize README
-- [ ] Migrate to SAM
+## Getting Started
 
-## Logic
+First, [click here](https://discord.com/api/oauth2/authorize?client_id=1096576031093174334&permissions=536870912&scope=bot) to add the bot to your Discord server. Once added, use the commands below in a text channel to subscribe to specific GitHub events.
 
-- Is user authenticated (has device code)?
-- Yes
-  - Get Device Code
-  - Request Token
-  - Is token expired?
-  - No
-    - Complete requests
-  - Yes
-    - Follow remaining steps
-- No
-  - Authenticate with Code (in DM)
-  - Store Device Code
-  - Request Token
-  - Complete Requests
+## Commands
+
+_Type or copy into Discord:_
+
+```bash
+/github repo: events:
+```
+
+### Examples
+
+_Subscribe to **All Events** in this repo:_
+
+```bash
+/github repo:NicPWNs/GitHub-Discord-Bot events:All Events
+```
+
+[SCREENSHOT]
+
+_Subscribe to **Stars** in this repo:_
+
+```bash
+/github repo:https://github.com/NicPWNs/GitHub-Discord-Bot events:Stars
+```
+
+[SCREENSHOT]
+
+> GitHub URLs or Owner/Repo formats work!
+
+## Issues
+
+Found a bug, ran into an issue, or have an idea? [Submit an issue](https://github.com/NicPWNs/GitHub-Discord-Bot/issues/new/choose)!
+
+## Permissions
+
+This bot requires specific permissions to function properly. The bot only requests the minimum necessary permissions for its intended functionality, prioritizing user privacy and security.
+
+1. **Discord - [_Manage Webhooks_](https://discord.com/developers/docs/topics/permissions#permissions)**: The bot requires this permission to create and manage webhooks in your Discord server. Webhooks are used to deliver GitHub-related events to your specified channels.
+2. **GitHub - [_Repository Webhooks_](https://docs.github.com/en/rest/authentication/permissions-required-for-github-apps#repository-permissions-for-webhooks)**: The bot needs permission to create and manage webhooks in your GitHub repositories.
+
+## Maintainer
+
+[Nic Jones, (@NicPWNs)](https://github.com/NicPWNs)
+
+## License
+
+This project is licensed under the [MIT License]().
+
+## Disclaimer
+
+This bot is not officially created or endorsed by GitHub, Inc. It is an independent project developed by [NicPWNs](https://github.com/NicPWNs) for enhancing GitHub integration under the [GitHub Developer Program](https://docs.github.com/en/get-started/exploring-integrations/github-developer-program).
+
+GitHub and the GitHub and Octocat logo are trademarks of GitHub, Inc. The use of the GitHub name and logo is for identification and reference purposes only and does not imply any association with the GitHub brand.
