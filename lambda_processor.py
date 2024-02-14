@@ -330,7 +330,7 @@ def lambda_processor(event, context):
 
     # Clean Repo Name
     repo_clean = sub(r"(?i)discord", "disc*rd", repo)
-    repo_clean = sub(r"(?i)clyde", "clyd*", repo)
+    repo_clean = sub(r"(?i)clyde", "clyd*", repo_clean)
 
     # Discord Webhook Avatar
     image = open("./images/github.png", "rb").read()
@@ -338,73 +338,72 @@ def lambda_processor(event, context):
     avatar = f"data:image/png;base64,{base64}"
 
     # Create Discord Webhook
-    # try:
-    # Current Webhooks
-    webhooks = get(
-        url=f"https://discord.com/api/channels/{channel}/webhooks",
-        headers=discord_headers,
-    ).json()
-    webhooks_list = [name["name"] for name in webhooks]
-
-    # All Webhook Name
-    all_webhook_name = f"{owner}/{repo_clean} GitHub All Events"
-
-    # New Webhook Name
-    webhook_name = f"{owner}/{repo_clean} GitHub {subscription}"
-
-    # Check Duplicates
-    if webhook_name in webhooks_list:
-        data = {
-            "embeds": [
-                {
-                    "title": "Input Error",
-                    "description": f"Discord channel <#{channel}> is already subscribed to **{subscription}** at [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
-                    "color": 0xBD2C00,
-                    "thumbnail": {
-                        "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
-                    },
-                }
-            ]
-        }
-
-        patch(
-            url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-            json=data,
-            headers=discord_headers,
-        )
-        return
-    elif all_webhook_name in webhooks_list:
-        data = {
-            "embeds": [
-                {
-                    "title": "Input Error",
-                    "description": f"Discord channel <#{channel}> is already subscribed to **All Events** at [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
-                    "color": 0xBD2C00,
-                    "thumbnail": {
-                        "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
-                    },
-                }
-            ]
-        }
-
-        patch(
-            url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-            json=data,
-            headers=discord_headers,
-        )
-        return
-    else:
-        data = {"name": webhook_name, "avatar": avatar}
-
-        webhook = post(
+    try:
+        # Current Webhooks
+        webhooks = get(
             url=f"https://discord.com/api/channels/{channel}/webhooks",
-            json=data,
             headers=discord_headers,
         ).json()
-        print(webhook)
-        webhook_id = webhook["id"]
-        webhook_url = webhook["url"]
-        # except:
+        webhooks_list = [name["name"] for name in webhooks]
+
+        # All Webhook Name
+        all_webhook_name = f"{owner}/{repo_clean} GitHub All Events"
+
+        # New Webhook Name
+        webhook_name = f"{owner}/{repo_clean} GitHub {subscription}"
+
+        # Check Duplicates
+        if webhook_name in webhooks_list:
+            data = {
+                "embeds": [
+                    {
+                        "title": "Input Error",
+                        "description": f"Discord channel <#{channel}> is already subscribed to **{subscription}** at [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                        "color": 0xBD2C00,
+                        "thumbnail": {
+                            "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                        },
+                    }
+                ]
+            }
+
+            patch(
+                url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
+                json=data,
+                headers=discord_headers,
+            )
+            return
+        elif all_webhook_name in webhooks_list:
+            data = {
+                "embeds": [
+                    {
+                        "title": "Input Error",
+                        "description": f"Discord channel <#{channel}> is already subscribed to **All Events** at [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                        "color": 0xBD2C00,
+                        "thumbnail": {
+                            "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                        },
+                    }
+                ]
+            }
+
+            patch(
+                url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
+                json=data,
+                headers=discord_headers,
+            )
+            return
+        else:
+            data = {"name": webhook_name, "avatar": avatar}
+
+            webhook = post(
+                url=f"https://discord.com/api/channels/{channel}/webhooks",
+                json=data,
+                headers=discord_headers,
+            ).json()
+            webhook_id = webhook["id"]
+            webhook_url = webhook["url"]
+    except:
         data = {
             "embeds": [
                 {
