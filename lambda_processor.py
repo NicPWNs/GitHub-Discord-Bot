@@ -286,7 +286,10 @@ def lambda_processor(event, context):
         repo = repo_search.group(2)
     else:
 
-        r = get(url=f"https://discord.com/api/channels/{channel}/webhooks").json()
+        r = get(
+            url=f"https://discord.com/api/channels/{channel}/webhooks",
+            headers=discord_headers,
+        ).json()
         webhooks = r
         print(webhooks)
 
