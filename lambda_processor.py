@@ -344,8 +344,8 @@ def lambda_processor(event, context):
             url=f"https://discord.com/api/channels/{channel}/webhooks",
             headers=discord_headers,
         ).json()
-        webhooks = [webhook_name["name"] for webhook_name in webhooks]
-        print(webhooks)
+        webhooks_list = [x["name"] for x in webhooks]
+        print(webhooks_list)
 
         webhook_name = f"{owner}/{repo_clean} GitHub {subscription}"
         data = {"name": webhook_name, "avatar": avatar}
