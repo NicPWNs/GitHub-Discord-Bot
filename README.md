@@ -19,10 +19,12 @@ Work in Progress 🚧
 - [x] Fix recursion
 - [x] Account for max 15 webhooks (per channel), max 20 (for stars), etc.
 - [x] Migrate to Lambda
-- [ ] Fix bad repo input
+- [x] Fix bad repo input
+- [ ] User's linked GitHub?
+- [ ] Ephemeral?
 - [ ] Check timeout
 - [ ] Duplicate subscriptions
-- [ ] Rename command to `/github`
+- [x] Rename command to `/github`
 - [ ] Formalize README
 - [ ] Migrate to SAM
 

@@ -262,6 +262,25 @@ def lambda_processor(event, context):
     if repo_search:
         owner = repo_search.group(1)
         repo = repo_search.group(2)
+    else:
+        data = {
+            "embeds": [
+                {
+                    "title": "Input Error",
+                    "description": "Be sure to provide the GitHub repo URL or {USERNAME}/{REPO} format.",
+                    "color": 0xBD2C00,
+                    "thumbnail": {
+                        "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                    },
+                }
+            ]
+        }
+
+        patch(
+            url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
+            json=data,
+            headers=discord_headers,
+        )
 
     # Begin Process
     data = {
