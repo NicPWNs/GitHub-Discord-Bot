@@ -345,16 +345,20 @@ def lambda_processor(event, context):
             headers=discord_headers,
         ).json()
         webhooks_list = [name["name"] for name in webhooks]
-        print(webhooks_list)
 
+        # All Webhook Name
+        all_webhook_name = f"{owner}/{repo_clean} GitHub All Events"
+
+        # New Webhook Name
         webhook_name = f"{owner}/{repo_clean} GitHub {subscription}"
 
+        # Check Duplicates
         if webhook_name in webhooks_list:
             data = {
                 "embeds": [
                     {
                         "title": "Input Error",
-                        "description": f"Discord channel <#{channel}> is already subscribed to **{subscription}**\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                        "description": f"Discord channel <#{channel}> is already subscribed to **{subscription}** at [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
                         "color": 0xBD2C00,
                         "thumbnail": {
                             "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
@@ -369,7 +373,26 @@ def lambda_processor(event, context):
                 headers=discord_headers,
             )
             return
+        elif all_webhook_name in webhooks_list:
+            data = {
+                "embeds": [
+                    {
+                        "title": "Input Error",
+                        "description": f"Discord channel <#{channel}> is already subscribed to **All Events** at [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                        "color": 0xBD2C00,
+                        "thumbnail": {
+                            "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                        },
+                    }
+                ]
+            }
 
+            patch(
+                url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
+                json=data,
+                headers=discord_headers,
+            )
+            return
         else:
             data = {"name": webhook_name, "avatar": avatar}
 
