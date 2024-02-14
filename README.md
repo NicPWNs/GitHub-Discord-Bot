@@ -1,6 +1,6 @@
 # GitHub Bot for Discord
 
-[SOCIAL BANNER]
+![image](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/852842d4-9029-425e-bd68-4d0f2cc2dd29)
 
 Subscribe a Discord Channel to Events in your GitHub Repositories. [Try it now!](https://discord.com/api/oauth2/authorize?client_id=1096576031093174334&permissions=536870912&scope=bot)
 
