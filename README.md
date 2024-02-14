@@ -1,5 +1,7 @@
 # GitHub Bot for Discord
 
+[SOCIAL BANNER]
+
 Subscribe a Discord Channel to Events in your GitHub Repositories. [Try it now!](https://discord.com/api/oauth2/authorize?client_id=1096576031093174334&permissions=536870912&scope=bot)
 
 > Like this bot? Give it a [⭐ on GitHub!](https://github.com/NicPWNs/github-discord-bot)
@@ -10,7 +12,7 @@ First, [click here](https://discord.com/api/oauth2/authorize?client_id=109657603
 
 ## Commands
 
-_Type or copy into Discord:_
+Type or copy into Discord:
 
 ```bash
 /github repo: events:
@@ -18,7 +20,7 @@ _Type or copy into Discord:_
 
 ### Examples
 
-_Subscribe to **All Events** in this repo:_
+Subscribe to **All Events** in this repo:
 
 ```bash
 /github repo:NicPWNs/GitHub-Discord-Bot events:All Events
@@ -26,7 +28,7 @@ _Subscribe to **All Events** in this repo:_
 
 [SCREENSHOT]
 
-_Subscribe to **Stars** in this repo:_
+Subscribe to **Stars** in this repo:
 
 ```bash
 /github repo:https://github.com/NicPWNs/GitHub-Discord-Bot events:Stars
