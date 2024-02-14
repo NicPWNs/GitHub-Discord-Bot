@@ -22,7 +22,7 @@ json_headers = {"Accept": "application/json"}
 
 # Authentication Timeout
 class TimeoutError(Exception):
-    pass
+    exit
 
 
 # AWS DynamoDB Config
@@ -157,6 +157,7 @@ def get_bearer_token(event):
         elif "access_token" in r:
             bearer_token = r["access_token"]
         elif int(time() - start_time) > 300:
+            # Channel Timeout Error
             data = {
                 "embeds": [
                     {
@@ -172,6 +173,26 @@ def get_bearer_token(event):
 
             patch(
                 url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
+                json=data,
+                headers=discord_headers,
+            )
+
+            # DM Timeout Error
+            data = {
+                "embeds": [
+                    {
+                        "title": "Timeout Error",
+                        "description": f"You didn't authenticate within five minutes. Try again in <#{channel}>",
+                        "color": 0xBD2C00,
+                        "thumbnail": {
+                            "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                        },
+                    }
+                ]
+            }
+
+            patch(
+                url=f"https://discord.com/api/channels/{dm_channel}/messages/{dm_message}",
                 json=data,
                 headers=discord_headers,
             )
@@ -438,7 +459,7 @@ def lambda_processor(event, context):
                 "embeds": [
                     {
                         "title": "Permission Error",
-                        "description": f"GitHub user `{github_user}` can't create webhooks\non [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                        "description": f"GitHub user [`{github_user}`](https://github.com/{github_user}) can't create webhooks\non [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
                         "color": 0xBD2C00,
                         "thumbnail": {
                             "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
@@ -475,7 +496,7 @@ def lambda_processor(event, context):
             json=data,
             headers=discord_headers,
         )
+        return
 
-    print(r)
-
+    print(f"ERROR: Exited without result: {r}")
     return
