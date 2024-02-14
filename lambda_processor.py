@@ -309,7 +309,7 @@ def lambda_processor(event, context):
     data = {
         "embeds": [
             {
-                "title": "GitHub",
+                "title": "Subscribing",
                 "description": f"<#{channel}> Subscribing to **{subscription}**\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
                 "color": 0xFFFFFF,
                 "thumbnail": {
@@ -538,7 +538,7 @@ def lambda_processor(event, context):
         data = {
             "embeds": [
                 {
-                    "title": "GitHub",
+                    "title": "Subscription Complete",
                     "description": f"<#{channel}>\nSubscribed to **{subscription}**\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
                     "color": 0xFFFFFF,
                     "thumbnail": {
