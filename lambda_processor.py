@@ -373,6 +373,7 @@ def lambda_processor(event, context):
                 headers=discord_headers,
             )
             return
+        # Check All Events
         elif all_webhook_name in webhooks_list:
             data = {
                 "embeds": [
@@ -393,6 +394,7 @@ def lambda_processor(event, context):
                 headers=discord_headers,
             )
             return
+        # Create Discord Webhook
         else:
             data = {"name": webhook_name, "avatar": avatar}
 
