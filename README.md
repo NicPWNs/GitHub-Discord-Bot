@@ -20,7 +20,7 @@ Type or copy into Discord:
 
 ### Examples
 
-Subscribe to **All Events** in *this* repo:
+Subscribe to **All Events** in _this_ repo:
 
 ```bash
 /github repo:NicPWNs/GitHub-Discord-Bot events:All Events
@@ -28,7 +28,7 @@ Subscribe to **All Events** in *this* repo:
 
 ![image](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/9a787c88-5717-40a5-adfb-034c064a5a0e)
 
-Subscribe to **Stars** in *this* repo:
+Subscribe to **Stars** in _this_ repo:
 
 ```bash
 /github repo:https://github.com/NicPWNs/GitHub-Discord-Bot events:Stars
