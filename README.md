@@ -4,7 +4,11 @@ Subscribe a Discord Channel to Events in your GitHub Repositories. [Try it now!]
 
 ![Banner](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/49c595ee-8b4b-47d1-9eb9-74c69a5ee94a)
 
-![](https://img.shields.io/badge/Get%20the%20Bot-5865F2?style=for-the-badge&logo=discord&logoColor=white)
+<a href="https://discord.com/api/oauth2/authorize?client_id=1096576031093174334&permissions=536870912&scope=bot">![Discord Bot](https://img.shields.io/badge/Get%20the%20Bot-5865F2?style=for-the-badge&logo=discord&logoColor=white)</a>
+<a href="https://aws.amazon.com/lambda/">![AWS Lambda](https://img.shields.io/badge/Serverless-FF9900?style=for-the-badge&logoColor=white&logo=awslambda)</a>
+<a href="https://www.python.org/downloads/release/python-3117/">![Python 3.11](https://img.shields.io/badge/Python%203.11-3776AB?style=for-the-badge&logoColor=white&logo=python)</a>
+<a href="https://discord.com/blog/slash-commands-are-here">![Slash Commands](https://img.shields.io/badge/Slash%20Commands-5865F2?style=for-the-badge&logoColor=white&logo=slashdot)</a>
+
 
 > Like this bot? Give it a [⭐ on GitHub!](https://github.com/NicPWNs/github-discord-bot)
 
