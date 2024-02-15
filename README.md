@@ -4,7 +4,7 @@ Subscribe a Discord Channel to Events in your GitHub Repositories. [Try it now!]
 
 ![Banner](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/49c595ee-8b4b-47d1-9eb9-74c69a5ee94a)
 
-![https://img.shields.io/badge/Get%20the%20Bot-5865F2?style=for-the-badge&logo=discord&logoColor=white]
+![](https://img.shields.io/badge/Get%20the%20Bot-5865F2?style=for-the-badge&logo=discord&logoColor=white)
 
 > Like this bot? Give it a [⭐ on GitHub!](https://github.com/NicPWNs/github-discord-bot)
 
