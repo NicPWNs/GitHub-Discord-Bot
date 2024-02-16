@@ -96,7 +96,7 @@ def get_bearer_token(event):
     application = event["application_id"]
     channel = event["channel_id"]
     token = event["token"]
-    discord_user = event["member"]["user"]["global_name"]
+    discord_user = event["member"]["user"]["username"]
     discord_user_id = event["member"]["user"]["id"]
 
     data = table.get_item(Key={"id": str(discord_user_id)})
