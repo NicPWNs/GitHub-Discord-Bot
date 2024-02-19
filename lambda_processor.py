@@ -512,6 +512,7 @@ def lambda_processor(event, context):
 
         # Permission Error
         else:
+            print(f"PERMISSION ERROR: {r}")
             data = {
                 "embeds": [
                     {
