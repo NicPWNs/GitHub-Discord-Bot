@@ -556,5 +556,7 @@ def lambda_processor(event, context):
         )
         return
 
-    print(f"[ERROR] Exited without result: {r}")
+    print(
+        f"[ERROR] Exited without result:\nGitHub User: {github_user}\nDiscord User: {discord_user_id}\nResponse: {r}"
+    )
     return
