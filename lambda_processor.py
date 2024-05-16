@@ -305,6 +305,28 @@ def lambda_processor(event, context):
         )
         return
 
+    # Filter Non-Repos
+    if owner == "m":
+        data = {
+            "embeds": [
+                {
+                    "title": "Input Error",
+                    "description": "Be sure to provide the GitHub repo URL or {USERNAME}/{REPO} format.",
+                    "color": 0xBD2C00,
+                    "thumbnail": {
+                        "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                    },
+                }
+            ]
+        }
+
+        patch(
+            url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
+            json=data,
+            headers=discord_headers,
+        )
+        return
+
     # Begin Process
     data = {
         "embeds": [
