@@ -268,7 +268,6 @@ def lambda_processor(event, context):
         pass
 
     # Interaction Context
-    print(event)
     repository = event["data"]["options"][0]["options"][0]["value"]
     events = event["data"]["options"][0]["options"][1]["value"]
     discord_user_id = event["member"]["user"]["id"]
