@@ -505,7 +505,7 @@ def lambda_processor(event, context):
             "embeds": [
                 {
                     "title": "GitHub Error",
-                    "description": f"The GitHub organization [`{owner}`](https://github.com/{owner}) has enabled OAuth App access restrictions, meaning that data access to third-parties is limited. [Click here](https://docs.github.com/articles/restricting-access-to-your-organization-s-data/) for more information on these restrictions, including how to enable this app.",
+                    "description": f"The GitHub organization [`{owner}`](https://github.com/{owner}) has enabled OAuth App access restrictions. [Click here](https://docs.github.com/articles/restricting-access-to-your-organization-s-data/) for more information on these restrictions, including how to enable this app.",
                     "color": 0xBD2C00,
                     "thumbnail": {
                         "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
