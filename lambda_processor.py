@@ -483,7 +483,7 @@ def lambda_processor(event, context):
         return
 
     # OAuth App Restrictions
-    if "OAuth App access restrictions" in r.__str__():
+    if "Validation Failed" in r.__str__():
         delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
         data = {
             "embeds": [
@@ -499,7 +499,7 @@ def lambda_processor(event, context):
         }
 
     # GitHub Error
-    if "Validation Failed" in r.__str__():
+    if "OAuth App access restrictions" in r.__str__():
         delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
         data = {
             "embeds": [
