@@ -483,13 +483,13 @@ def lambda_processor(event, context):
         return
 
     # OAuth App Restrictions
-    if "Validation Failed" in r.__str__():
+    if "OAuth App access restrictions" in r.__str__():
         delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
         data = {
             "embeds": [
                 {
                     "title": "GitHub Error",
-                    "description": f"{r['errors'][0]['message']}\n\n[Check your GitHub Repo's Webhook Settings](https://github.com/{owner}/{repo}/settings/hooks)",
+                    "description": f"The GitHub organization [`{owner}`](https://github.com/{owner}) has enabled OAuth App access restrictions. [Click here](https://docs.github.com/articles/restricting-access-to-your-organization-s-data/) for more information on these restrictions, including how to enable this app.",
                     "color": 0xBD2C00,
                     "thumbnail": {
                         "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
@@ -498,14 +498,22 @@ def lambda_processor(event, context):
             ]
         }
 
+        patch(
+            url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
+            json=data,
+            headers=discord_headers,
+        )
+
+        return
+
     # GitHub Error
-    if "OAuth App access restrictions" in r.__str__():
+    if "Validation Failed" in r.__str__():
         delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
         data = {
             "embeds": [
                 {
                     "title": "GitHub Error",
-                    "description": f"The GitHub organization [`{owner}`](https://github.com/{owner}) has enabled OAuth App access restrictions. [Click here](https://docs.github.com/articles/restricting-access-to-your-organization-s-data/) for more information on these restrictions, including how to enable this app.",
+                    "description": f"{r['errors'][0]['message']}\n\n[Check your GitHub Repo's Webhook Settings](https://github.com/{owner}/{repo}/settings/hooks)",
                     "color": 0xBD2C00,
                     "thumbnail": {
                         "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
