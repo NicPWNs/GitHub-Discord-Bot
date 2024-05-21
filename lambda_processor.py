@@ -558,6 +558,26 @@ def subscribe(event, context):
     exit(1)
 
 
+def status(event, context):
+
+    channel = event["channel_id"]
+
+    data = {
+        "embeds": [
+            {
+                "title": "Subscription Status",
+                "description": f"<#{channel}> is subscribed to:\n",
+                "color": 0xFFFFFF,
+                "thumbnail": {
+                    "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                },
+            }
+        ]
+    }
+
+    return data
+
+
 # Lambda Executes
 def lambda_processor(event, context):
 
@@ -575,6 +595,8 @@ def lambda_processor(event, context):
     # Parse Subcommands
     if subcommand == "subscribe":
         data = subscribe(event, context)
+    elif subcommand == "status":
+        data = status(event, context)
 
     patch(
         url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",

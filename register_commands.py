@@ -63,6 +63,11 @@ json = {
                 },
             ],
         },
+        {
+            "name": "status",
+            "type": 1,
+            "description": "List GitHub repository event subscriptions in this channel.",
+        },
     ],
 }
 
