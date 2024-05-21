@@ -568,15 +568,24 @@ def status(event):
         url=f"https://discord.com/api/channels/{channel}/webhooks",
         headers=discord_headers,
     ).json()
-    print(webhooks)
     webhooks_list = [name["name"] for name in webhooks]
 
     # String List of Webhooks
     subscriptions = ""
     for webhook in webhooks_list:
-        owner = ""
-        repo = ""
-        subscriptions += f"• {webhook}\n"
+        # Parse Owner and Repo Names
+        repo_search = search(r"(\S*)\/(\S*)", webhook)
+
+        if repo_search:
+            owner = repo_search.group(1)
+            repo = repo_search.group(2)
+
+        # Reverse Clean Repo Name
+        repo = sub(r"(?i)disc\*rd", "discord", repo)
+        repo = sub(r"(?i)clyd\*", "clyde", repo)
+
+        # Craft String
+        subscriptions += f"• [{webhook}](https://github.com/{owner}/{repo})\n"
 
     data = {
         "embeds": [
