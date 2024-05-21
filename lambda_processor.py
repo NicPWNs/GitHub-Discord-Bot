@@ -555,6 +555,8 @@ def subscribe(event, context):
         f"[ERROR] Exited without result:\nGitHub User: {github_user}\nDiscord User: {discord_user_id}\nResponse: {r}"
     )
 
+    exit(1)
+
 
 # Lambda Executes
 def lambda_processor(event, context):
