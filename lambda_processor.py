@@ -258,15 +258,7 @@ def get_bearer_token(event):
     return bearer_token, github_user
 
 
-# Lambda Executes
-def lambda_processor(event, context):
-
-    # Deserialize SQS Event
-    try:
-        event = loads(event["Records"][0]["body"])
-    except KeyError:
-        pass
-
+def subscribe(event, context):
     # Interaction Context
     repository = event["data"]["options"][0]["options"][0]["value"]
     events = event["data"]["options"][0]["options"][1]["value"]
@@ -389,12 +381,8 @@ def lambda_processor(event, context):
                 ]
             }
 
-            patch(
-                url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-                json=data,
-                headers=discord_headers,
-            )
-            return
+            return data
+
         # Check All Events
         elif all_webhook_name in webhooks_list:
             data = {
@@ -410,12 +398,8 @@ def lambda_processor(event, context):
                 ]
             }
 
-            patch(
-                url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-                json=data,
-                headers=discord_headers,
-            )
-            return
+            return data
+
         # Create Discord Webhook
         else:
             data = {"name": webhook_name, "avatar": avatar}
@@ -441,13 +425,7 @@ def lambda_processor(event, context):
             ]
         }
 
-        patch(
-            url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-            json=data,
-            headers=discord_headers,
-        )
-
-        return
+        return data
 
     # All Events
     if events == "all":
@@ -479,7 +457,7 @@ def lambda_processor(event, context):
     if "Bad credentials" in r.__str__():
         delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
         table.delete_item(Key={"id": str(discord_user_id)})
-        lambda_processor(event, context)
+        subscribe(event, context)
         return
 
     # OAuth App Restrictions
@@ -498,13 +476,7 @@ def lambda_processor(event, context):
             ]
         }
 
-        patch(
-            url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-            json=data,
-            headers=discord_headers,
-        )
-
-        return
+        return data
 
     # GitHub Error
     if "Validation Failed" in r.__str__():
@@ -522,13 +494,7 @@ def lambda_processor(event, context):
             ]
         }
 
-        patch(
-            url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-            json=data,
-            headers=discord_headers,
-        )
-
-        return
+        return data
 
     # Other Errors
     if "Not Found" in r.__str__():
@@ -548,13 +514,7 @@ def lambda_processor(event, context):
                 ]
             }
 
-            patch(
-                url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-                json=data,
-                headers=discord_headers,
-            )
-
-            return
+            return data
 
         # Permission Error
         else:
@@ -572,13 +532,7 @@ def lambda_processor(event, context):
                 ]
             }
 
-            patch(
-                url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-                json=data,
-                headers=discord_headers,
-            )
-
-            return
+            return data
 
     # GitHub Webhook Created
     if "created_at" in r.__str__():
@@ -595,14 +549,34 @@ def lambda_processor(event, context):
             ]
         }
 
-        patch(
-            url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-            json=data,
-            headers=discord_headers,
-        )
-        return
+        return data
 
     print(
         f"[ERROR] Exited without result:\nGitHub User: {github_user}\nDiscord User: {discord_user_id}\nResponse: {r}"
+    )
+
+
+# Lambda Executes
+def lambda_processor(event, context):
+
+    # Deserialize SQS Event
+    try:
+        event = loads(event["Records"][0]["body"])
+    except KeyError:
+        pass
+
+    # Get Response Criteria
+    subcommand = event["data"]["options"][0]["name"]
+    application = event["application_id"]
+    token = event["token"]
+
+    # Parse Subcommands
+    if subcommand == "subscribe":
+        data = subscribe(event, context)
+
+    patch(
+        url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
+        json=data,
+        headers=discord_headers,
     )
     return
