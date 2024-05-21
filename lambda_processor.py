@@ -4,8 +4,8 @@ from boto3 import resource
 from re import search, sub
 from time import time, sleep
 from base64 import b64encode
-from requests import get, patch, post, delete
 from dotenv import load_dotenv
+from requests import get, patch, post, delete
 
 
 # Load Secrets
@@ -258,7 +258,7 @@ def get_bearer_token(event):
     return bearer_token, github_user
 
 
-def subscribe(event, context):
+def subscribe(event):
     # Interaction Context
     repository = event["data"]["options"][0]["options"][0]["value"]
     events = event["data"]["options"][0]["options"][1]["value"]
@@ -457,7 +457,7 @@ def subscribe(event, context):
     if "Bad credentials" in r.__str__():
         delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
         table.delete_item(Key={"id": str(discord_user_id)})
-        subscribe(event, context)
+        subscribe(event)
         return
 
     # OAuth App Restrictions
@@ -558,15 +558,28 @@ def subscribe(event, context):
     exit(1)
 
 
-def status(event, context):
+def status(event):
 
+    # Interaction Context
     channel = event["channel_id"]
+
+    # Current Webhooks
+    webhooks = get(
+        url=f"https://discord.com/api/channels/{channel}/webhooks",
+        headers=discord_headers,
+    ).json()
+    webhooks_list = [name["name"] for name in webhooks]
+
+    # String List of Webhooks
+    subscriptions = ""
+    for webhook in webhooks_list:
+        subscriptions += f"• {webhook}\n"
 
     data = {
         "embeds": [
             {
                 "title": "Subscription Status",
-                "description": f"<#{channel}> is subscribed to:\n",
+                "description": f"<#{channel}> is subscribed to:\n{subscriptions}",
                 "color": 0xFFFFFF,
                 "thumbnail": {
                     "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
@@ -594,10 +607,11 @@ def lambda_processor(event, context):
 
     # Parse Subcommands
     if subcommand == "subscribe":
-        data = subscribe(event, context)
+        data = subscribe(event)
     elif subcommand == "status":
-        data = status(event, context)
+        data = status(event)
 
+    # Final Command Response
     patch(
         url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
         json=data,
