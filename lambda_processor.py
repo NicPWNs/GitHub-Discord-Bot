@@ -579,6 +579,8 @@ def status(event):
         if repo_search:
             owner = repo_search.group(1)
             repo = repo_search.group(2)
+        else:
+            continue
 
         # Reverse Clean Repo Name
         repo = sub(r"(?i)discоrd", "discord", repo)
@@ -595,7 +597,7 @@ def status(event):
         "embeds": [
             {
                 "title": "Subscription Status",
-                "description": f"**<#{channel}> is subscribed to:**\n{subscriptions}",
+                "description": f"**<#{channel}> is subscribed to:**\n\n{subscriptions}",
                 "color": 0xFFFFFF,
                 "thumbnail": {
                     "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
