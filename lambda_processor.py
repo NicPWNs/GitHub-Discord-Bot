@@ -587,6 +587,10 @@ def status(event):
         # Craft String
         subscriptions += f"• [{webhook}](https://github.com/{owner}/{repo})\n"
 
+    # No Subscriptions
+    if subscriptions == "":
+        subscriptions = "Nothing!"
+
     data = {
         "embeds": [
             {
