@@ -21,7 +21,7 @@ First, [add the bot](https://discord.com/api/oauth2/authorize?client_id=10965760
 Type or copy into Discord:
 
 ```bash
-/github repo: events:
+/github subscribe repo: events:
 ```
 
 ### Examples
@@ -29,7 +29,7 @@ Type or copy into Discord:
 Subscribe to **All Events** in _this_ repo:
 
 ```bash
-/github repo:NicPWNs/GitHub-Discord-Bot events:All Events
+/github subscribe repo:NicPWNs/GitHub-Discord-Bot events:All Events
 ```
 
 ![image](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/9a787c88-5717-40a5-adfb-034c064a5a0e)
@@ -37,7 +37,7 @@ Subscribe to **All Events** in _this_ repo:
 Subscribe to **Stars** in _this_ repo:
 
 ```bash
-/github repo:https://github.com/NicPWNs/GitHub-Discord-Bot events:Stars
+/github subscribe repo:https://github.com/NicPWNs/GitHub-Discord-Bot events:Stars
 ```
 
 ![image](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/4605785c-c0e3-457f-bfc2-4af92b0f4498)
