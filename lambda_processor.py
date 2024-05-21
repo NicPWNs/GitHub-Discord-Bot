@@ -568,18 +568,21 @@ def status(event):
         url=f"https://discord.com/api/channels/{channel}/webhooks",
         headers=discord_headers,
     ).json()
+    print(webhooks)
     webhooks_list = [name["name"] for name in webhooks]
 
     # String List of Webhooks
     subscriptions = ""
     for webhook in webhooks_list:
+        owner = ""
+        repo = ""
         subscriptions += f"• {webhook}\n"
 
     data = {
         "embeds": [
             {
                 "title": "Subscription Status",
-                "description": f"<#{channel}> is subscribed to:\n{subscriptions}",
+                "description": f"**<#{channel}> is subscribed to:**\n{subscriptions}",
                 "color": 0xFFFFFF,
                 "thumbnail": {
                     "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
