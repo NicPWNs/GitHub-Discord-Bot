@@ -72,7 +72,7 @@ json = {
             "description": "List GitHub repository subscriptions in this channel.",
         },
         {
-            "name": "delete",
+            "name": "unsubscribe",
             "type": 1,
             "description": "Delete a subscription to GitHub repository events in this channel.",
             "options": [
