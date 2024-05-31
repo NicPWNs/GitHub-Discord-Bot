@@ -18,13 +18,21 @@ First, [add the bot](https://discord.com/api/oauth2/authorize?client_id=10965760
 
 ## Commands
 
-Type or copy into Discord:
+> Type or Copy into Discord!
+
+### Subscribe
 
 ```bash
 /github subscribe repo: events:
 ```
 
-### Examples
+### Status
+
+```bash
+/github status
+```
+
+## Examples
 
 Subscribe to **All Events** in _this_ repo:
 
