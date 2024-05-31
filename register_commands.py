@@ -41,7 +41,7 @@ choices = [
     {"name": "Wikis", "value": "gollum"},
 ]
 
-# `/github` Command
+# /github Command
 json = {
     "name": "github",
     "description": "Manage subscriptions to GitHub repository events.",
