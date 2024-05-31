@@ -47,22 +47,49 @@ json = {
     "description": "Manage subscriptions to GitHub repository events.",
     "options": [
         {
-            "name": "subscribe",
-            "type": 1,
-            "description": "Subscribe to GitHub repository events in this channel.",
+            "name": "subscription",
+            "type": 2,
+            "description": "List GitHub repository subscriptions in this channel.",
             "options": [
                 {
-                    "name": "repo",
-                    "description": "Repo URL or {USERNAME}/{REPO} format.",
-                    "type": 3,
-                    "required": True,
+                    "name": "create",
+                    "type": 1,
+                    "description": "Subscribe to GitHub repository events in this channel.",
+                    "options": [
+                        {
+                            "name": "repo",
+                            "description": "Repo URL or {USERNAME}/{REPO} format.",
+                            "type": 3,
+                            "required": True,
+                        },
+                        {
+                            "name": "events",
+                            "description": "Events to subscribe this channel to.",
+                            "type": 3,
+                            "required": True,
+                            "choices": choices,
+                        },
+                    ],
                 },
                 {
-                    "name": "events",
-                    "description": "Events to subscribe this channel to.",
-                    "type": 3,
-                    "required": True,
-                    "choices": choices,
+                    "name": "delete",
+                    "type": 1,
+                    "description": "Delete a subscription to GitHub repository events in this channel.",
+                    "options": [
+                        {
+                            "name": "repo",
+                            "description": "Repo URL or {USERNAME}/{REPO} format.",
+                            "type": 3,
+                            "required": True,
+                        },
+                        {
+                            "name": "events",
+                            "description": "Events to delete the subscription for in this channel. Use Status Command to see what subscriptions exist.",
+                            "type": 3,
+                            "required": True,
+                            "choices": choices,
+                        },
+                    ],
                 },
             ],
         },
@@ -70,26 +97,6 @@ json = {
             "name": "status",
             "type": 1,
             "description": "List GitHub repository subscriptions in this channel.",
-        },
-        {
-            "name": "unsubscribe",
-            "type": 1,
-            "description": "Delete a subscription to GitHub repository events in this channel.",
-            "options": [
-                {
-                    "name": "repo",
-                    "description": "Repo URL or {USERNAME}/{REPO} format.",
-                    "type": 3,
-                    "required": True,
-                },
-                {
-                    "name": "events",
-                    "description": "Events to delete the subscription for in this channel. Use Status Command to see what subscriptions exist.",
-                    "type": 3,
-                    "required": True,
-                    "choices": choices,
-                },
-            ],
         },
     ],
 }
