@@ -67,6 +67,11 @@ json = {
             ],
         },
         {
+            "name": "status",
+            "type": 1,
+            "description": "List GitHub repository subscriptions in this channel.",
+        },
+        {
             "name": "delete",
             "type": 1,
             "description": "Delete a subscription to GitHub repository events in this channel.",
@@ -85,11 +90,6 @@ json = {
                     "choices": choices,
                 },
             ],
-        },
-        {
-            "name": "status",
-            "type": 1,
-            "description": "List GitHub repository subscriptions in this channel.",
         },
     ],
 }
