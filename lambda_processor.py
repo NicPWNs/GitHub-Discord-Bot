@@ -290,12 +290,7 @@ def subscribe(event):
             ]
         }
 
-        patch(
-            url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-            json=data,
-            headers=discord_headers,
-        )
-        return
+        return data
 
     # Filter Non-Repos
     if owner == "m":
@@ -312,12 +307,7 @@ def subscribe(event):
             ]
         }
 
-        patch(
-            url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
-            json=data,
-            headers=discord_headers,
-        )
-        return
+        return data
 
     # Begin Process
     data = {
@@ -558,6 +548,134 @@ def subscribe(event):
     exit(1)
 
 
+def delete(event):
+    # Interaction Context
+    repository = event["data"]["options"][0]["options"][0]["value"]
+    events = event["data"]["options"][0]["options"][1]["value"]
+    discord_user_id = event["member"]["user"]["id"]
+    channel = event["channel_id"]
+    application = event["application_id"]
+    token = event["token"]
+    subscription = list(event_options.keys())[
+        list(event_options.values()).index(events)
+    ]
+
+    # Extract Repo and Owner
+    repo_search = search(r"[\/\/]*[github\.com]*[\/]*([\w.-]+)\/([\w.-]+)", repository)
+
+    if repo_search:
+        owner = repo_search.group(1)
+        repo = repo_search.group(2)
+    else:
+        data = {
+            "embeds": [
+                {
+                    "title": "Input Error",
+                    "description": "Be sure to provide the GitHub repo URL or {USERNAME}/{REPO} format.",
+                    "color": 0xBD2C00,
+                    "thumbnail": {
+                        "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                    },
+                }
+            ]
+        }
+
+        return data
+
+    # Filter Non-Repos
+    if owner == "m":
+        data = {
+            "embeds": [
+                {
+                    "title": "Input Error",
+                    "description": "Be sure to provide the GitHub repo URL or {USERNAME}/{REPO} format.",
+                    "color": 0xBD2C00,
+                    "thumbnail": {
+                        "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                    },
+                }
+            ]
+        }
+
+        return data
+
+    # Begin Process
+    data = {
+        "embeds": [
+            {
+                "title": "Deleting",
+                "description": f"<#{channel}> Deleting subscription to **{subscription}**\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                "color": 0xFFFFFF,
+                "thumbnail": {
+                    "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                },
+            }
+        ]
+    }
+
+    patch(
+        url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
+        json=data,
+        headers=discord_headers,
+    )
+
+    # Clean Repo Name
+    repo_clean = sub(r"(?i)discord", "discоrd", repo)
+    repo_clean = sub(r"(?i)clyde", "clydе", repo_clean)
+
+    # Current Webhooks
+    webhooks = get(
+        url=f"https://discord.com/api/channels/{channel}/webhooks",
+        headers=discord_headers,
+    ).json()
+    webhooks_list = [name["name"] for name in webhooks]
+
+    # Webhook to Delete Name
+    webhook_name = f"{owner}/{repo_clean} GitHub {subscription}"
+
+    # Delete Webhook
+    if webhook_name in webhooks_list:
+        # Get Webhook ID
+        for webhook in webhooks_list:
+            if webhook["name"] == webhook_name:
+                webhook_id = webhook["id"]
+
+        # Delete Webhook Based on ID
+        delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
+
+        data = {
+            "embeds": [
+                {
+                    "title": "Deletion Complete",
+                    "description": f"<#{channel}>\nSubscription to **{subscription}**\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo}) successfully deleted!",
+                    "color": 0xFFFFFF,
+                    "thumbnail": {
+                        "url": f"https://github.com/{owner}.png",
+                    },
+                }
+            ]
+        }
+
+        return data
+
+    # Webhook Not Found
+    else:
+        data = {
+            "embeds": [
+                {
+                    "title": "Input Error",
+                    "description": f"Discord channel <#{channel}> is not subscribed to **{subscription}** at [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                    "color": 0xBD2C00,
+                    "thumbnail": {
+                        "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                    },
+                }
+            ]
+        }
+
+        return data
+
+
 def status(event):
 
     # Interaction Context
@@ -626,6 +744,8 @@ def lambda_processor(event, context):
     # Parse Subcommands
     if subcommand == "subscribe":
         data = subscribe(event)
+    elif subcommand == "delete":
+        data = delete(event)
     elif subcommand == "status":
         data = status(event)
 
