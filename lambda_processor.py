@@ -650,7 +650,7 @@ def subscription_delete(event):
         for webhook in discord_webhooks:
             if webhook["name"] == webhook_name:
                 webhook_id = webhook["id"]
-                webhook_url = webhook["url"]
+                webhook_url = webhook["url"] + "/github"
 
         # Delete Discord Webhook Based on ID
         delete(
@@ -668,11 +668,8 @@ def subscription_delete(event):
         github_webhooks = get(
             f"https://api.github.com/repos/{owner}/{repo}/hooks", headers=github_headers
         ).json()
-        print(github_webhooks)
 
         for webhook in github_webhooks:
-            print("Github" + webhook["config"]["url"])
-            print("Discord" + webhook_url)
             if webhook["config"]["url"] == webhook_url:
                 github_webhook_id = webhook["id"]
 
