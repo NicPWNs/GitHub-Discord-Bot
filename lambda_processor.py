@@ -746,7 +746,7 @@ def lambda_processor(event, context):
     if command == "status":
         if subcommand == "list":
             data = status(event)
-    if command == "subsciptions":
+    if command == "subscriptions":
         if subcommand == "create":
             data = subscribe(event)
         elif subcommand == "delete":
