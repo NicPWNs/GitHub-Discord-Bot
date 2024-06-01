@@ -738,7 +738,7 @@ def lambda_processor(event, context):
 
     # Get Response Criteria
     command = event["data"]["options"][0]["name"]
-    subcommand = event["data"]["options"][0][0]["name"]
+    # subcommand = event["data"]["options"][0]["name"][0]["name"]
     application = event["application_id"]
     token = event["token"]
 
