@@ -143,4 +143,4 @@ response = post(
 if int(response.status_code) == 200:
     print("Command Registration Succeeded!")
 else:
-    print(f"Command Registration Failed: {response.json()}")
+    print(f"Command Registration Failed: {response.content}")
