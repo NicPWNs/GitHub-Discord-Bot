@@ -652,7 +652,7 @@ def subscription_delete(event):
                 webhook_id = webhook["id"]
 
         # Delete Webhook Based on ID
-        r = delete(
+        delete(
             url=f"https://discord.com/api/webhooks/{webhook_id}",
             headers=discord_headers,
         )
