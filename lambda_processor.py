@@ -260,6 +260,7 @@ def get_bearer_token(event):
 
 def subscription_create(event):
     # Interaction Context
+    print(event["data"])
     repository = event["data"]["options"][0]["options"][0]["value"]
     events = event["data"]["options"][0]["options"][1]["value"]
     discord_user_id = event["member"]["user"]["id"]
@@ -742,7 +743,7 @@ def lambda_processor(event, context):
     application = event["application_id"]
     token = event["token"]
 
-    # Parse Subcommands\
+    # Parse Subcommands
     if command == "status":
         if subcommand == "list":
             data = status_list(event)
