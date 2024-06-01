@@ -635,28 +635,45 @@ def subscription_delete(event):
     repo_clean = sub(r"(?i)clyde", "clydе", repo_clean)
 
     # Current Webhooks
-    webhooks = get(
+    discord_webhooks = get(
         url=f"https://discord.com/api/channels/{channel}/webhooks",
         headers=discord_headers,
     ).json()
-    webhooks_list = [name["name"] for name in webhooks]
+    webhooks_list = [name["name"] for name in discord_webhooks]
 
     # Webhook to Delete Name
     webhook_name = f"{owner}/{repo_clean} GitHub {subscription}"
 
-    # Delete Webhook
+    # Delete Webhooks
     if webhook_name in webhooks_list:
-        # Get Webhook ID
-        for webhook in webhooks:
+        # Get Discord Webhook ID
+        for webhook in discord_webhooks:
             if webhook["name"] == webhook_name:
                 webhook_id = webhook["id"]
 
-        # Delete Webhook Based on ID
+        # Delete Discord Webhook Based on ID
         delete(
             url=f"https://discord.com/api/webhooks/{webhook_id}",
             headers=discord_headers,
         )
 
+        # Delete GitHub Webhook
+        github_headers = {
+            "Accept": "application/vnd.github+json",
+            "Authorization": "Bearer " + get_bearer_token(event),
+        }
+
+        github_webhooks = get(
+            f"https://api.github.com/repos/{owner}/{repo}/hooks", headers=github_headers
+        ).json()
+        print(github_webhooks)
+
+        # delete(
+        #    f"https://api.github.com/repos/{owner}/{repo}/hooks/{hook_id}",
+        #    headers=github_headers,
+        # )
+
+        # Deletion Complete
         data = {
             "embeds": [
                 {
