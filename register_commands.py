@@ -16,6 +16,11 @@ json = {
     "description": "Manage subscriptions to GitHub repository events.",
     "options": [
         {
+            "name": "status",
+            "type": 1,
+            "description": "List GitHub repository subscriptions in this channel.",
+        },
+        {
             "name": "subscription",
             "type": 2,
             "description": "List GitHub repository subscriptions in this channel.",
@@ -123,11 +128,6 @@ json = {
                     ],
                 },
             ],
-        },
-        {
-            "name": "status",
-            "type": 1,
-            "description": "List GitHub repository subscriptions in this channel.",
         },
     ],
 }
