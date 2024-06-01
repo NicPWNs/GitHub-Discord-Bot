@@ -445,14 +445,20 @@ def subscription_create(event):
 
     # Invalid Authentication
     if "Bad credentials" in r.__str__():
-        delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
+        delete(
+            url=f"https://discord.com/api/webhooks/{webhook_id}",
+            headers=discord_headers,
+        )
         table.delete_item(Key={"id": str(discord_user_id)})
         subscription_create(event)
         return
 
     # OAuth App Restrictions
     if "OAuth App access restrictions" in r.__str__():
-        delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
+        delete(
+            url=f"https://discord.com/api/webhooks/{webhook_id}",
+            headers=discord_headers,
+        )
         data = {
             "embeds": [
                 {
@@ -470,7 +476,10 @@ def subscription_create(event):
 
     # GitHub Error
     if "Validation Failed" in r.__str__():
-        delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
+        delete(
+            url=f"https://discord.com/api/webhooks/{webhook_id}",
+            headers=discord_headers,
+        )
         data = {
             "embeds": [
                 {
@@ -488,7 +497,10 @@ def subscription_create(event):
 
     # Other Errors
     if "Not Found" in r.__str__():
-        delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
+        delete(
+            url=f"https://discord.com/api/webhooks/{webhook_id}",
+            headers=discord_headers,
+        )
         # Nonexistent Repo
         if get(f"https://github.com/{owner}/{repo}").status_code == 404:
             data = {
@@ -640,7 +652,10 @@ def subscription_delete(event):
                 webhook_id = webhook["id"]
 
         # Delete Webhook Based on ID
-        r = delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
+        r = delete(
+            url=f"https://discord.com/api/webhooks/{webhook_id}",
+            headers=discord_headers,
+        )
         print(r.json())
 
         data = {
