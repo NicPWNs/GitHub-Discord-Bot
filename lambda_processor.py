@@ -635,8 +635,9 @@ def subscription_delete(event):
     # Delete Webhook
     if webhook_name in webhooks_list:
         # Get Webhook ID
-        for webhook in webhooks_list:
-            if webhook == webhook_name:
+        for webhook in webhooks:
+            print(webhook)
+            if webhook["name"] == webhook_name:
                 webhook_id = webhook["id"]
 
         # Delete Webhook Based on ID
