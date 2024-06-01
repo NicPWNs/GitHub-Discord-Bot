@@ -258,7 +258,7 @@ def get_bearer_token(event):
     return bearer_token, github_user
 
 
-def subscribe(event):
+def subscription_create(event):
     # Interaction Context
     repository = event["data"]["options"][0]["options"][0]["value"]
     events = event["data"]["options"][0]["options"][1]["value"]
@@ -548,7 +548,7 @@ def subscribe(event):
     exit(1)
 
 
-def delete(event):
+def subscription_delete(event):
     # Interaction Context
     repository = event["data"]["options"][0]["options"][0]["value"]
     events = event["data"]["options"][0]["options"][1]["value"]
@@ -676,7 +676,7 @@ def delete(event):
         return data
 
 
-def status(event):
+def status_list(event):
 
     # Interaction Context
     channel = event["channel_id"]
@@ -745,12 +745,12 @@ def lambda_processor(event, context):
     # Parse Subcommands\
     if command == "status":
         if subcommand == "list":
-            data = status(event)
+            data = status_list(event)
     if command == "subscriptions":
         if subcommand == "create":
-            data = subscribe(event)
+            data = subscription_create(event)
         elif subcommand == "delete":
-            data = delete(event)
+            data = subscription_delete(event)
 
     # Final Command Response
     patch(
