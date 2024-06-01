@@ -603,7 +603,7 @@ def subscription_delete(event):
         "embeds": [
             {
                 "title": "Deleting",
-                "description": f"<#{channel}> Deleting subscription to **{subscription}**\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                "description": f"Deleting <#{channel}> subscription to **{subscription}**\nat [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
                 "color": 0xFFFFFF,
                 "thumbnail": {
                     "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
@@ -636,8 +636,7 @@ def subscription_delete(event):
     if webhook_name in webhooks_list:
         # Get Webhook ID
         for webhook in webhooks_list:
-            print(webhook)
-            if webhook[0]["name"] == webhook_name:
+            if webhook == webhook_name:
                 webhook_id = webhook["id"]
 
         # Delete Webhook Based on ID
