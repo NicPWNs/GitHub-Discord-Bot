@@ -261,8 +261,8 @@ def get_bearer_token(event):
 def subscription_create(event):
     # Interaction Context
     print(event["data"])
-    repository = event["data"]["options"][0]["options"][0]["value"]
-    events = event["data"]["options"][0]["options"][1]["value"]
+    repository = event["data"]["options"][0]["options"][0]["options"][0]["value"]
+    events = event["data"]["options"][0]["options"][0]["options"][1]["value"]
     discord_user_id = event["member"]["user"]["id"]
     channel = event["channel_id"]
     application = event["application_id"]
