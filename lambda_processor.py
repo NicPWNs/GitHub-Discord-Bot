@@ -260,12 +260,11 @@ def get_bearer_token(event):
 
 def subscription_create(event):
     # Interaction Context
-    print(event["data"])
     repository = event["data"]["options"][0]["options"][0]["options"][0]["value"]
     events = event["data"]["options"][0]["options"][0]["options"][1]["value"]
     discord_user_id = event["member"]["user"]["id"]
-    channel = event["channel_id"]
     application = event["application_id"]
+    channel = event["channel_id"]
     token = event["token"]
     subscription = list(event_options.keys())[
         list(event_options.values()).index(events)
@@ -551,11 +550,10 @@ def subscription_create(event):
 
 def subscription_delete(event):
     # Interaction Context
-    repository = event["data"]["options"][0]["options"][0]["value"]
-    events = event["data"]["options"][0]["options"][1]["value"]
-    discord_user_id = event["member"]["user"]["id"]
-    channel = event["channel_id"]
+    repository = event["data"]["options"][0]["options"][0]["options"][0]["value"]
+    events = event["data"]["options"][0]["options"][0]["options"][1]["value"]
     application = event["application_id"]
+    channel = event["channel_id"]
     token = event["token"]
     subscription = list(event_options.keys())[
         list(event_options.values()).index(events)
