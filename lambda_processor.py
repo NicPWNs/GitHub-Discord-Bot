@@ -636,12 +636,12 @@ def subscription_delete(event):
     if webhook_name in webhooks_list:
         # Get Webhook ID
         for webhook in webhooks:
-            print(webhook)
             if webhook["name"] == webhook_name:
                 webhook_id = webhook["id"]
 
         # Delete Webhook Based on ID
-        delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
+        r = delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
+        print(r.json())
 
         data = {
             "embeds": [
