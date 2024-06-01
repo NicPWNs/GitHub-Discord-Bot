@@ -40,7 +40,8 @@ First, [add the bot](https://discord.com/api/oauth2/authorize?client_id=10965760
 
 ## Example
 
-[image]
+![Live GIF Example](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/016ceff7-833a-4fa6-acd6-59c23097db2f)
+
 
 1. Subscribed to **All Events** in _this_ repo.
 2. Received a new Star ⭐ event on the GitHub repo.
