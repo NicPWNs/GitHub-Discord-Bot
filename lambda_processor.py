@@ -447,7 +447,7 @@ def subscription_create(event):
     if "Bad credentials" in r.__str__():
         delete(url=f"https://discord.com/api/webhooks/{webhook_id}")
         table.delete_item(Key={"id": str(discord_user_id)})
-        subscribe(event)
+        subscription_create(event)
         return
 
     # OAuth App Restrictions
