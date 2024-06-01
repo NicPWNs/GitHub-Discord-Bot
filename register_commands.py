@@ -17,8 +17,15 @@ json = {
     "options": [
         {
             "name": "status",
-            "type": 1,
-            "description": "List GitHub repository subscriptions in this channel.",
+            "type": 2,
+            "description": "Get status of GitHub Bot for Discord.",
+            "options": [
+                {
+                    "name": "list",
+                    "type": 1,
+                    "description": "List GitHub repository subscriptions in this channel.",
+                }
+            ],
         },
         {
             "name": "subscription",

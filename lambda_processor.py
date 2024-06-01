@@ -737,17 +737,20 @@ def lambda_processor(event, context):
         pass
 
     # Get Response Criteria
-    subcommand = event["data"]["options"][0]["name"]
+    command = event["data"]["options"][0]["name"]
+    subcommand = event["data"]["options"][0]["name"][0]["name"]
     application = event["application_id"]
     token = event["token"]
 
-    # Parse Subcommands
-    if subcommand == "subscribe":
-        data = subscribe(event)
-    elif subcommand == "delete":
-        data = delete(event)
-    elif subcommand == "status":
-        data = status(event)
+    # Parse Subcommands\
+    if command == "status":
+        if subcommand == "list":
+            data = status(event)
+    if command == "subsciptions":
+        if subcommand == "create":
+            data = subscribe(event)
+        elif subcommand == "delete":
+            data = delete(event)
 
     # Final Command Response
     patch(
