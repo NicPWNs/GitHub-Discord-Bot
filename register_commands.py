@@ -89,7 +89,7 @@ json = {
                         },
                         {
                             "name": "events",
-                            "description": "Events to delete the subscription for in this channel. Use Status Command to see what subscriptions exist.",
+                            "description": "Events to delete the subscription for in this channel.",
                             "type": 3,
                             "required": True,
                             "choices": [
@@ -143,4 +143,4 @@ response = post(
 if int(response.status_code) == 200:
     print("Command Registration Succeeded!")
 else:
-    print(f"Command Registration Failed: {response.content}")
+    print(f"Command Registration Failed: {response.json()}")
