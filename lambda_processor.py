@@ -656,7 +656,6 @@ def subscription_delete(event):
             url=f"https://discord.com/api/webhooks/{webhook_id}",
             headers=discord_headers,
         )
-        print(r.json())
 
         data = {
             "embeds": [
