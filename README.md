@@ -20,19 +20,19 @@ First, [add the bot](https://discord.com/api/oauth2/authorize?client_id=10965760
 
 > Type or Copy into Discord!
 
-### Subscription Create
+### Subscription Create ➕
 
 ```bash
 /github subscription create repo: events:
 ```
 
-### Subscription Delete
+### Subscription Delete 🗑️
 
 ```bash
 /github subscription delete repo: events:
 ```
 
-### Status
+### List Subscriptions 📋
 
 ```bash
 /github status list
