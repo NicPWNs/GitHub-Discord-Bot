@@ -20,35 +20,32 @@ First, [add the bot](https://discord.com/api/oauth2/authorize?client_id=10965760
 
 > Type or Copy into Discord!
 
-### Subscribe
+### Subscription Create
 
 ```bash
-/github subscribe repo: events:
+/github subscription create repo: events:
+```
+
+### Subscription Delete
+
+```bash
+/github subscription delete repo: events:
 ```
 
 ### Status
 
 ```bash
-/github status
+/github status list
 ```
 
-## Examples
+## Example
 
-Subscribe to **All Events** in _this_ repo:
+[image]
 
-```bash
-/github subscribe repo:NicPWNs/GitHub-Discord-Bot events:All Events
-```
-
-![image](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/9a787c88-5717-40a5-adfb-034c064a5a0e)
-
-Subscribe to **Stars** in _this_ repo:
-
-```bash
-/github subscribe repo:https://github.com/NicPWNs/GitHub-Discord-Bot events:Stars
-```
-
-![image](https://github.com/NicPWNs/GitHub-Discord-Bot/assets/23003787/4605785c-c0e3-457f-bfc2-4af92b0f4498)
+1. Subscribed to **All Events** in _this_ repo.
+2. Received a new Star ⭐ event on the GitHub repo.
+3. Listed current subscriptions for the Discord channel.
+4. Delete the **All Events** subscription in the channel.
 
 > GitHub URLs or Owner/Repo formats work!
 
