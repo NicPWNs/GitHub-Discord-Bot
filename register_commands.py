@@ -64,11 +64,16 @@ json = {
                                 {"name": "Discussions", "value": "discussion"},
                                 {"name": "Forks", "value": "fork"},
                                 {"name": "Issues", "value": "issues"},
+                                {"name": "Issue Comments", "value": "issue_comment"},
                                 {"name": "Labels", "value": "label"},
                                 {"name": "Members", "value": "member"},
                                 {"name": "Milestones", "value": "milestone"},
                                 {"name": "Packages", "value": "package"},
                                 {"name": "Pull Requests", "value": "pull_request"},
+                                {
+                                    "name": "Pull Request Review Comments",
+                                    "value": "pull_request_review_comment",
+                                },
                                 {"name": "Pushes", "value": "push"},
                                 {"name": "Releases", "value": "release"},
                                 {
@@ -115,11 +120,16 @@ json = {
                                 {"name": "Discussions", "value": "discussion"},
                                 {"name": "Forks", "value": "fork"},
                                 {"name": "Issues", "value": "issues"},
+                                {"name": "Issue Comments", "value": "issue_comment"},
                                 {"name": "Labels", "value": "label"},
                                 {"name": "Members", "value": "member"},
                                 {"name": "Milestones", "value": "milestone"},
                                 {"name": "Packages", "value": "package"},
                                 {"name": "Pull Requests", "value": "pull_request"},
+                                {
+                                    "name": "Pull Request Review Comments",
+                                    "value": "pull_request_review_comment",
+                                },
                                 {"name": "Pushes", "value": "push"},
                                 {"name": "Releases", "value": "release"},
                                 {
