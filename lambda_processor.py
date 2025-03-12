@@ -273,7 +273,10 @@ def subscription_create(event):
     ]
 
     # Extract Repo and Owner
-    repo_search = search(r"[\/\/]*[github\.com]*[\/]*([\w.-]+)\/([\w.-]+)", repository)
+    repo_search = search(
+        r"/(?:https?:\/\/)?(?:www\.)?(?:github\.com\/)?([^\/\s]+)\/([^\/\s]+)",
+        repository,
+    )
 
     if repo_search:
         owner = repo_search.group(1)
