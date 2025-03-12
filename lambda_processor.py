@@ -274,7 +274,7 @@ def subscription_create(event):
 
     # Extract Repo and Owner
     repo_search = search(
-        r"/(?:https?:\/\/)?(?:www\.)?(?:github\.com\/)?([^\/\s]+)\/([^\/\s]+)",
+        r"(?:https?:\/\/)?(?:www\.)?(?:github\.com\/)?([A-Za-z0-9._-]+)\/([A-Za-z0-9._-]+)",
         repository,
     )
 
