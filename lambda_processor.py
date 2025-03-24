@@ -404,6 +404,7 @@ def subscription_create(event):
                 json=data,
                 headers=discord_headers,
             ).json()
+            print(webhook)
             webhook_id = webhook["id"]
             webhook_url = webhook["url"]
     except Exception as e:
