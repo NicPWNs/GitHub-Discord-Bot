@@ -580,7 +580,7 @@ def subscription_delete(event):
     application = event["application_id"]
     channel = event["channel_id"]
     token = event["token"]
-    discord_user = event["member"]["user"]["id"]
+    discord_user = event["member"]["user"]["username"]
     subscription = list(event_options.keys())[
         list(event_options.values()).index(events)
     ]
@@ -737,7 +737,7 @@ def status_list(event):
 
     # Interaction Context
     channel = event["channel_id"]
-    discord_user = event["member"]["user"]["id"]
+    discord_user = event["member"]["user"]["username"]
 
     # Debug Statements
     print(f"Discord User: {discord_user}\nCommand: LIST")
