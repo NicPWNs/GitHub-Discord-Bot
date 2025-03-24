@@ -338,8 +338,8 @@ def subscription_create(event):
     bearer_token, github_user = get_bearer_token(event)
 
     # Clean Repo Name
-    repo_clean = sub(r"(?i)discord", "discor-", repo)
-    repo_clean = sub(r"(?i)clyde", "clyd-", repo_clean)
+    repo_clean = sub(r"(?i)discord", "discor*", repo)
+    repo_clean = sub(r"(?i)clyde", "clyd*", repo_clean)
 
     # Discord Webhook Avatar
     image = open("./images/github.png", "rb").read()
@@ -640,8 +640,8 @@ def subscription_delete(event):
     )
 
     # Clean Repo Name
-    repo_clean = sub(r"(?i)discord", "discоrd", repo)
-    repo_clean = sub(r"(?i)clyde", "clydе", repo_clean)
+    repo_clean = sub(r"(?i)discord", "discor*", repo)
+    repo_clean = sub(r"(?i)clyde", "clyd*", repo_clean)
 
     # Current Webhooks
     discord_webhooks = get(
@@ -746,8 +746,8 @@ def status_list(event):
             continue
 
         # Reverse Clean Repo Name
-        repo = sub(r"(?i)discоrd", "discord", repo)
-        repo = sub(r"(?i)clydе", "clyde", repo)
+        repo = sub(r"(?i)discor*", "discord", repo)
+        repo = sub(r"(?i)clyd*", "clyde", repo)
 
         # Craft String
         subscriptions += f"• [{webhook}](https://github.com/{owner}/{repo})\n"
