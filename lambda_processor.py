@@ -347,7 +347,9 @@ def subscription_create(event):
     avatar = f"data:image/png;base64,{base64}"
 
     # Debug Statements
-    print(f"GitHub User: {github_user}\nDiscord User: {discord_user_id}")
+    print(
+        f"GitHub User: {github_user}\nDiscord User: {discord_user_id}\nCommand: CREATE"
+    )
 
     # Create Discord Webhook
     try:
@@ -680,7 +682,9 @@ def subscription_delete(event):
         }
 
         # Debug Statements
-        print(f"GitHub User: {github_user}\nDiscord User: {discord_user_id}")
+        print(
+            f"GitHub User: {github_user}\nDiscord User: {discord_user_id}\nCommand: DELETE"
+        )
 
         github_webhooks = get(
             f"https://api.github.com/repos/{owner}/{repo}/hooks", headers=github_headers
@@ -738,15 +742,15 @@ def status_list(event):
     discord_user_id = event["member"]["user"]["id"]
 
     # Debug Statements
-    print(f"Discord User: {discord_user_id}")
+    print(f"Discord User: {discord_user_id}\nCommand: LIST")
 
     # Current Webhooks
-    webhooks = get(
+    discord_webhooks = get(
         url=f"https://discord.com/api/channels/{channel}/webhooks",
         headers=discord_headers,
     ).json()
-    print(f"DISCORD WEBHOOKS: {webhooks}")
-    webhooks_list = [name["name"] for name in webhooks]
+    print(f"DISCORD WEBHOOKS: {discord_webhooks}")
+    webhooks_list = [name["name"] for name in discord_webhooks]
 
     # String List of Webhooks
     subscriptions = ""
