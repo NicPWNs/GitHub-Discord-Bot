@@ -338,8 +338,8 @@ def subscription_create(event):
     bearer_token, github_user = get_bearer_token(event)
 
     # Clean Repo Name
-    repo_clean = sub(r"(?i)discord", "discоrd", repo)
-    repo_clean = sub(r"(?i)clyde", "clydе", repo_clean)
+    repo_clean = sub(r"(?i)discord", "discor-", repo)
+    repo_clean = sub(r"(?i)clyde", "clyd-", repo_clean)
 
     # Discord Webhook Avatar
     image = open("./images/github.png", "rb").read()
@@ -404,11 +404,11 @@ def subscription_create(event):
                 json=data,
                 headers=discord_headers,
             ).json()
-            print(webhook)
             webhook_id = webhook["id"]
             webhook_url = webhook["url"]
     except Exception as e:
         print(f"DISCORD ERROR: {e}")
+        print(f"WEBHOOK RESPONSE: {webhook}")
         data = {
             "embeds": [
                 {
