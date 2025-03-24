@@ -264,6 +264,7 @@ def subscription_create(event):
     # Interaction Context
     repository = event["data"]["options"][0]["options"][0]["options"][0]["value"]
     events = event["data"]["options"][0]["options"][0]["options"][1]["value"]
+    discord_user = event["member"]["user"]["username"]
     discord_user_id = event["member"]["user"]["id"]
     application = event["application_id"]
     channel = event["channel_id"]
@@ -347,9 +348,7 @@ def subscription_create(event):
     avatar = f"data:image/png;base64,{base64}"
 
     # Debug Statements
-    print(
-        f"GitHub User: {github_user}\nDiscord User: {discord_user_id}\nCommand: CREATE"
-    )
+    print(f"GitHub User: {github_user}\nDiscord User: {discord_user}\nCommand: CREATE")
 
     # Create Discord Webhook
     try:
@@ -568,7 +567,7 @@ def subscription_create(event):
         return data
 
     print(
-        f"[ERROR] Exited without result:\nGitHub User: {github_user}\nDiscord User: {discord_user_id}\nResponse: {r}"
+        f"[ERROR] Exited without result:\nGitHub User: {github_user}\nDiscord User: {discord_user}\nResponse: {r}"
     )
 
     exit(1)
@@ -581,7 +580,7 @@ def subscription_delete(event):
     application = event["application_id"]
     channel = event["channel_id"]
     token = event["token"]
-    discord_user_id = event["member"]["user"]["id"]
+    discord_user = event["member"]["user"]["id"]
     subscription = list(event_options.keys())[
         list(event_options.values()).index(events)
     ]
@@ -683,7 +682,7 @@ def subscription_delete(event):
 
         # Debug Statements
         print(
-            f"GitHub User: {github_user}\nDiscord User: {discord_user_id}\nCommand: DELETE"
+            f"GitHub User: {github_user}\nDiscord User: {discord_user}\nCommand: DELETE"
         )
 
         github_webhooks = get(
@@ -739,10 +738,10 @@ def status_list(event):
 
     # Interaction Context
     channel = event["channel_id"]
-    discord_user_id = event["member"]["user"]["id"]
+    discord_user = event["member"]["user"]["id"]
 
     # Debug Statements
-    print(f"Discord User: {discord_user_id}\nCommand: LIST")
+    print(f"Discord User: {discord_user}\nCommand: LIST")
 
     # Current Webhooks
     discord_webhooks = get(
