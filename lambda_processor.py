@@ -346,6 +346,9 @@ def subscription_create(event):
     base64 = b64encode(image).decode("utf-8")
     avatar = f"data:image/png;base64,{base64}"
 
+    # Debug Statements
+    print(f"GitHub User: {github_user}\nDiscord User: {discord_user_id}")
+
     # Create Discord Webhook
     try:
         # Current Webhooks
@@ -558,6 +561,7 @@ def subscription_create(event):
                 }
             ]
         }
+        print(f"SUBSCRIPTION COMPLETE: Subscribed to {subscription} at {owner}/{repo}")
 
         return data
 
@@ -575,6 +579,7 @@ def subscription_delete(event):
     application = event["application_id"]
     channel = event["channel_id"]
     token = event["token"]
+    discord_user_id = event["member"]["user"]["id"]
     subscription = list(event_options.keys())[
         list(event_options.values()).index(events)
     ]
@@ -647,7 +652,7 @@ def subscription_delete(event):
         url=f"https://discord.com/api/channels/{channel}/webhooks",
         headers=discord_headers,
     ).json()
-    print(f"DEBUG: {discord_webhooks}")
+    print(f"DISCORD WEBHOOKS: {discord_webhooks}")
     webhooks_list = [name["name"] for name in discord_webhooks]
 
     # Webhook to Delete Name
@@ -673,6 +678,9 @@ def subscription_delete(event):
             "Accept": "application/vnd.github+json",
             "Authorization": "Bearer " + bearer_token,
         }
+
+        # Debug Statements
+        print(f"GitHub User: {github_user}\nDiscord User: {discord_user_id}")
 
         github_webhooks = get(
             f"https://api.github.com/repos/{owner}/{repo}/hooks", headers=github_headers
@@ -701,6 +709,8 @@ def subscription_delete(event):
             ]
         }
 
+        print(f"DELETE COMPLETE: Deleted {subscription} at {owner}/{repo}")
+
         return data
 
     # Webhook Not Found
@@ -725,6 +735,10 @@ def status_list(event):
 
     # Interaction Context
     channel = event["channel_id"]
+    discord_user_id = event["member"]["user"]["id"]
+
+    # Debug Statements
+    print(f"Discord User: {discord_user_id}")
 
     # Current Webhooks
     webhooks = get(
