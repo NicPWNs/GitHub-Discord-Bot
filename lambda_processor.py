@@ -647,6 +647,7 @@ def subscription_delete(event):
         url=f"https://discord.com/api/channels/{channel}/webhooks",
         headers=discord_headers,
     ).json()
+    print(f"DEBUG: {discord_webhooks}")
     webhooks_list = [name["name"] for name in discord_webhooks]
 
     # Webhook to Delete Name
