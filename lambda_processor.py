@@ -748,6 +748,8 @@ def status_list(event):
         # Reverse Clean Repo Name
         repo = sub(r"(?i)discorx", "discord", repo)
         repo = sub(r"(?i)clydx", "clyde", repo)
+        webhook = sub(r"(?i)discorx", "discord", webhook)
+        webhook = sub(r"(?i)clydx", "clyde", webhook)
 
         # Craft String
         subscriptions += f"• [{webhook}](https://github.com/{owner}/{repo})\n"
