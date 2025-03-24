@@ -406,7 +406,8 @@ def subscription_create(event):
             ).json()
             webhook_id = webhook["id"]
             webhook_url = webhook["url"]
-    except:
+    except Exception as e:
+        print(f"DISCORD ERROR: {e}")
         data = {
             "embeds": [
                 {
@@ -485,6 +486,7 @@ def subscription_create(event):
             url=f"https://discord.com/api/webhooks/{webhook_id}",
             headers=discord_headers,
         )
+        print(f"GITHUB ERROR: {r}")
         data = {
             "embeds": [
                 {
@@ -508,6 +510,7 @@ def subscription_create(event):
         )
         # Nonexistent Repo
         if get(f"https://github.com/{owner}/{repo}").status_code == 404:
+            print(f"NOT FOUND ERROR: {r}")
             data = {
                 "embeds": [
                     {
