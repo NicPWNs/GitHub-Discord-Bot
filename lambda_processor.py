@@ -353,11 +353,11 @@ def subscription_create(event):
     # Create Discord Webhook
     try:
         # Current Webhooks
-        webhooks = get(
+        discord_webhooks = get(
             url=f"https://discord.com/api/channels/{channel}/webhooks",
             headers=discord_headers,
         ).json()
-        webhooks_list = [name["name"] for name in webhooks]
+        webhooks_list = [name["name"] for name in discord_webhooks]
 
         # All Webhook Name
         all_webhook_name = f"{owner}/{repo_clean} GitHub All Events"
@@ -653,7 +653,6 @@ def subscription_delete(event):
         url=f"https://discord.com/api/channels/{channel}/webhooks",
         headers=discord_headers,
     ).json()
-    print(f"DISCORD WEBHOOKS: {discord_webhooks}")
     webhooks_list = [name["name"] for name in discord_webhooks]
 
     # Webhook to Delete Name
