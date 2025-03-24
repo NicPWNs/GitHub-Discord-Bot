@@ -748,7 +748,23 @@ def status_list(event):
         headers=discord_headers,
     ).json()
     print(f"DISCORD WEBHOOKS: {discord_webhooks}")
-    webhooks_list = [name["name"] for name in discord_webhooks]
+    try:
+        webhooks_list = [name["name"] for name in discord_webhooks]
+    except:
+        data = {
+            "embeds": [
+                {
+                    "title": "Discord Permission Error",
+                    "description": f"Discord user `{discord_user}` can't list webhooks for <#{channel}>",
+                    "color": 0xBD2C00,
+                    "thumbnail": {
+                        "url": "https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6cc3c481a15a141738_icon_clyde_white_RGB.png",
+                    },
+                }
+            ]
+        }
+
+        return data
 
     # String List of Webhooks
     subscriptions = ""
