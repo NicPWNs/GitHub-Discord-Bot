@@ -745,6 +745,7 @@ def status_list(event):
         url=f"https://discord.com/api/channels/{channel}/webhooks",
         headers=discord_headers,
     ).json()
+    print(f"DISCORD WEBHOOKS: {webhooks}")
     webhooks_list = [name["name"] for name in webhooks]
 
     # String List of Webhooks
