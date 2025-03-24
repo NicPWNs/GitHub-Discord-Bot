@@ -408,7 +408,6 @@ def subscription_create(event):
             webhook_url = webhook["url"]
     except Exception as e:
         print(f"DISCORD ERROR: {e}")
-        print(f"WEBHOOK RESPONSE: {webhook}")
         data = {
             "embeds": [
                 {
