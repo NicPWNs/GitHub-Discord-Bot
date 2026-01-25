@@ -1,9 +1,9 @@
 from os import getenv
 from json import loads
-from boto3 import resource
+from boto3 import resource, client
 from re import search, sub
 from time import time, sleep
-from base64 import b64encode
+from base64 import b64encode, b64decode
 from dotenv import load_dotenv
 from requests import get, patch, post, delete
 
@@ -13,6 +13,7 @@ load_dotenv()
 DDB_TABLE = getenv("DDB_TABLE")
 GITHUB_CLIENT = getenv("GITHUB_CLIENT")
 DISCORD_TOKEN = getenv("DISCORD_TOKEN")
+KMS_KEY_ID = getenv("KMS_KEY_ID")  # Optional: KMS key for token encryption
 
 
 # Headers
@@ -21,12 +22,37 @@ json_headers = {"Accept": "application/json"}
 
 
 # Authentication Timeout
-class TimeoutError(Exception):
-    exit
+class AuthTimeoutError(Exception):
+    """Raised when user doesn't complete GitHub authentication within the time limit."""
+    pass
 
 
 # AWS DynamoDB Config
 table = resource("dynamodb").Table(DDB_TABLE)
+
+# AWS KMS Config (optional encryption)
+kms = client("kms") if KMS_KEY_ID else None
+
+
+def encrypt_token(token):
+    """Encrypt a token using AWS KMS. Returns base64-encoded ciphertext."""
+    if not kms:
+        return token  # No encryption if KMS not configured
+    response = kms.encrypt(KeyId=KMS_KEY_ID, Plaintext=token.encode())
+    return b64encode(response["CiphertextBlob"]).decode()
+
+
+def decrypt_token(encrypted_token):
+    """Decrypt a token using AWS KMS. Accepts base64-encoded ciphertext."""
+    if not kms:
+        return encrypted_token  # No decryption if KMS not configured
+    try:
+        ciphertext = b64decode(encrypted_token)
+        response = kms.decrypt(CiphertextBlob=ciphertext)
+        return response["Plaintext"].decode()
+    except Exception:
+        # Token might be stored unencrypted (backwards compatibility)
+        return encrypted_token
 
 
 # Event Options
@@ -82,11 +108,15 @@ def get_device_code(dm_channel):
         ]
     }
 
-    dm_message = post(
+    dm_response = post(
         url=f"https://discord.com/api/channels/{dm_channel}/messages",
         json=data,
         headers=discord_headers,
-    ).json()["id"]
+    ).json()
+
+    dm_message = dm_response.get("id")
+    if not dm_message:
+        raise AuthTimeoutError(f"Failed to send DM: {dm_response}")
 
     return device_code, dm_message
 
@@ -103,13 +133,36 @@ def get_bearer_token(event):
 
     data = table.get_item(Key={"id": str(discord_user_id)})
 
-    if int(data["ResponseMetadata"]["HTTPHeaders"]["content-length"]) < 5:
+    if "Item" not in data:
         data = {"recipient_id": discord_user_id}
-        dm_channel = post(
+        dm_response = post(
             url="https://discord.com/api/users/@me/channels",
             json=data,
             headers=discord_headers,
-        ).json()["id"]
+        ).json()
+
+        if "id" not in dm_response:
+            # User likely has DMs disabled
+            data = {
+                "embeds": [
+                    {
+                        "title": "DM Error",
+                        "description": "Could not send you a DM. Please enable DMs from server members and try again.",
+                        "color": 0xBD2C00,
+                        "thumbnail": {
+                            "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                        },
+                    }
+                ]
+            }
+            patch(
+                url=f"https://discord.com/api/webhooks/{application}/{token}/messages/@original",
+                json=data,
+                headers=discord_headers,
+            )
+            raise AuthTimeoutError("Could not create DM channel")
+
+        dm_channel = dm_response["id"]
 
         # Channel Auth Begin
         data = {
@@ -133,7 +186,7 @@ def get_bearer_token(event):
 
         device_code, dm_message = get_device_code(dm_channel)
     else:
-        bearer_token = data["Item"]["bearer_token"]
+        bearer_token = decrypt_token(data["Item"]["bearer_token"])
         github_user = data["Item"]["github_user"]
         return bearer_token, github_user
 
@@ -164,7 +217,7 @@ def get_bearer_token(event):
                 "embeds": [
                     {
                         "title": "Timeout Error",
-                        "description": "You didn't authenticate within five minutes",
+                        "description": "You didn't authenticate within five minutes. Run the command again to retry.",
                         "color": 0xBD2C00,
                         "thumbnail": {
                             "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
@@ -199,7 +252,7 @@ def get_bearer_token(event):
                 headers=discord_headers,
             )
 
-            raise TimeoutError
+            raise AuthTimeoutError("User did not authenticate within 5 minutes")
 
     # DM Auth Complete
     data = {
@@ -243,24 +296,25 @@ def get_bearer_token(event):
         "Accept": "application/vnd.github+json",
         "Authorization": "Bearer " + bearer_token,
     }
-    github_user = get(url="https://api.github.com/user", headers=github_headers).json()[
-        "login"
-    ]
+    github_response = get(url="https://api.github.com/user", headers=github_headers).json()
+    github_user = github_response.get("login")
+    if not github_user:
+        raise AuthTimeoutError(f"Failed to get GitHub user: {github_response}")
 
-    # Save Token
+    # Save Token (encrypted if KMS configured)
     table.put_item(
         Item={
             "id": str(discord_user_id),
             "discord_user": str(discord_user),
             "github_user": str(github_user),
-            "bearer_token": str(bearer_token),
+            "bearer_token": encrypt_token(str(bearer_token)),
         }
     )
 
     return bearer_token, github_user
 
 
-def subscription_create(event):
+def subscription_create(event, _retry=False):
     # Interaction Context
     repository = event["data"]["options"][0]["options"][0]["options"][0]["value"]
     events = event["data"]["options"][0]["options"][0]["options"][1]["value"]
@@ -298,8 +352,9 @@ def subscription_create(event):
 
         return data
 
-    # Filter Non-Repos
-    if owner == "m":
+    # Filter URL subdomains incorrectly parsed as repo owners (e.g., m.github.com)
+    invalid_owners = {"m", "www"}
+    if owner.lower() in invalid_owners:
         data = {
             "embeds": [
                 {
@@ -343,7 +398,8 @@ def subscription_create(event):
     repo_clean = sub(r"(?i)clyde", "clydx", repo_clean)
 
     # Discord Webhook Avatar
-    image = open("./images/github.png", "rb").read()
+    with open("./images/github.png", "rb") as f:
+        image = f.read()
     base64 = b64encode(image).decode("utf-8")
     avatar = f"data:image/png;base64,{base64}"
 
@@ -412,11 +468,12 @@ def subscription_create(event):
             webhook_url = webhook["url"]
     except Exception as e:
         print(f"DISCORD ERROR: {e}")
+        # Could be webhook limit (15 max) or permission error
         data = {
             "embeds": [
                 {
                     "title": "Discord Error",
-                    "description": f"Discord channel <#{channel}> can only have 15 webhooks.",
+                    "description": f"Could not create webhook in <#{channel}>. This may be due to the 15 webhook limit or missing permissions.",
                     "color": 0xBD2C00,
                     "thumbnail": {
                         "url": "https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6cc3c481a15a141738_icon_clyde_white_RGB.png",
@@ -453,18 +510,34 @@ def subscription_create(event):
         json=data,
     ).json()
 
-    # Invalid Authentication
-    if "Bad credentials" in r.__str__():
+    # Get message from response for error checking
+    response_message = r.get("message", "")
+
+    # Invalid Authentication - retry once after clearing cached token
+    if "Bad credentials" in response_message:
         delete(
             url=f"https://discord.com/api/webhooks/{webhook_id}",
             headers=discord_headers,
         )
         table.delete_item(Key={"id": str(discord_user_id)})
-        subscription_create(event)
-        return
+        if _retry:
+            # Already retried once, don't recurse again
+            return {
+                "embeds": [
+                    {
+                        "title": "Authentication Error",
+                        "description": "GitHub authentication failed after retry. Your token may have been revoked. Please run the command again to re-authenticate.",
+                        "color": 0xBD2C00,
+                        "thumbnail": {
+                            "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                        },
+                    }
+                ]
+            }
+        return subscription_create(event, _retry=True)
 
     # OAuth App Restrictions
-    if "OAuth App access restrictions" in r.__str__():
+    if "OAuth App access restrictions" in response_message:
         delete(
             url=f"https://discord.com/api/webhooks/{webhook_id}",
             headers=discord_headers,
@@ -485,17 +558,18 @@ def subscription_create(event):
         return data
 
     # GitHub Error
-    if "Validation Failed" in r.__str__():
+    if response_message == "Validation Failed":
         delete(
             url=f"https://discord.com/api/webhooks/{webhook_id}",
             headers=discord_headers,
         )
         print(f"GITHUB ERROR: {r}")
+        error_msg = r.get("errors", [{}])[0].get("message", "Unknown error")
         data = {
             "embeds": [
                 {
                     "title": "GitHub Error",
-                    "description": f"{r['errors'][0]['message']}\n\n[Check your GitHub Repo's Webhook Settings](https://github.com/{owner}/{repo}/settings/hooks)",
+                    "description": f"{error_msg}\n\n[Check your GitHub Repo's Webhook Settings](https://github.com/{owner}/{repo}/settings/hooks)",
                     "color": 0xBD2C00,
                     "thumbnail": {
                         "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
@@ -507,7 +581,7 @@ def subscription_create(event):
         return data
 
     # Other Errors
-    if "Not Found" in r.__str__():
+    if response_message == "Not Found":
         delete(
             url=f"https://discord.com/api/webhooks/{webhook_id}",
             headers=discord_headers,
@@ -519,7 +593,7 @@ def subscription_create(event):
                 "embeds": [
                     {
                         "title": "Access Error",
-                        "description": f"Repo [`{owner}/{repo}`](https://github.com/{owner}/{repo})\nis inaccessible or does not exist",
+                        "description": f"Repo [`{owner}/{repo}`](https://github.com/{owner}/{repo}) is inaccessible or does not exist. Check the repo name and ensure it's not private.",
                         "color": 0xBD2C00,
                         "thumbnail": {
                             "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
@@ -537,7 +611,7 @@ def subscription_create(event):
                 "embeds": [
                     {
                         "title": "Permission Error",
-                        "description": f"GitHub user [`{github_user}`](https://github.com/{github_user}) can't create webhooks\non [`{owner}/{repo}`](https://github.com/{owner}/{repo})",
+                        "description": f"GitHub user [`{github_user}`](https://github.com/{github_user}) doesn't have admin access to [`{owner}/{repo}`](https://github.com/{owner}/{repo}). You need admin permissions to create webhooks.",
                         "color": 0xBD2C00,
                         "thumbnail": {
                             "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
@@ -549,7 +623,7 @@ def subscription_create(event):
             return data
 
     # GitHub Webhook Created
-    if "created_at" in r.__str__():
+    if "created_at" in r:
         data = {
             "embeds": [
                 {
@@ -570,7 +644,19 @@ def subscription_create(event):
         f"[ERROR] Exited without result:\nGitHub User: {github_user}\nDiscord User: {discord_user}\nResponse: {r}"
     )
 
-    exit(1)
+    # Return error response instead of exit(1) which is problematic in Lambda
+    return {
+        "embeds": [
+            {
+                "title": "Unexpected Error",
+                "description": "Something went wrong while creating the GitHub webhook. Please try again. If the issue persists, check [GitHub Status](https://githubstatus.com).",
+                "color": 0xBD2C00,
+                "thumbnail": {
+                    "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                },
+            }
+        ]
+    }
 
 
 def subscription_delete(event):
@@ -586,7 +672,10 @@ def subscription_delete(event):
     ]
 
     # Extract Repo and Owner
-    repo_search = search(r"[\/\/]*[github\.com]*[\/]*([\w.-]+)\/([\w.-]+)", repository)
+    repo_search = search(
+        r"(?:https?:\/\/)?(?:www\.)?(?:github\.com\/)?([A-Za-z0-9._-]+)\/([A-Za-z0-9._-]+)",
+        repository,
+    )
 
     if repo_search:
         owner = repo_search.group(1)
@@ -607,8 +696,9 @@ def subscription_delete(event):
 
         return data
 
-    # Filter Non-Repos
-    if owner == "m":
+    # Filter URL subdomains incorrectly parsed as repo owners (e.g., m.github.com)
+    invalid_owners = {"m", "www"}
+    if owner.lower() in invalid_owners:
         data = {
             "embeds": [
                 {
@@ -653,7 +743,23 @@ def subscription_delete(event):
         url=f"https://discord.com/api/channels/{channel}/webhooks",
         headers=discord_headers,
     ).json()
-    webhooks_list = [name["name"] for name in discord_webhooks]
+
+    try:
+        webhooks_list = [name["name"] for name in discord_webhooks]
+    except (TypeError, KeyError):
+        data = {
+            "embeds": [
+                {
+                    "title": "Discord Permission Error",
+                    "description": f"Could not list webhooks for <#{channel}>. Ensure the bot has 'Manage Webhooks' permission in this channel.",
+                    "color": 0xBD2C00,
+                    "thumbnail": {
+                        "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                    },
+                }
+            ]
+        }
+        return data
 
     # Webhook to Delete Name
     webhook_name = f"{owner}/{repo_clean} GitHub {subscription}"
@@ -661,10 +767,28 @@ def subscription_delete(event):
     # Delete Webhooks
     if webhook_name in webhooks_list:
         # Get Discord Webhook ID
+        webhook_id = None
+        webhook_url = None
         for webhook in discord_webhooks:
             if webhook["name"] == webhook_name:
                 webhook_id = webhook["id"]
                 webhook_url = webhook["url"] + "/github"
+                break
+
+        if not webhook_id:
+            data = {
+                "embeds": [
+                    {
+                        "title": "Sync Error",
+                        "description": "Webhook was in the list but couldn't be found. This may be a temporary issue - please try again.",
+                        "color": 0xBD2C00,
+                        "thumbnail": {
+                            "url": "https://github.githubassets.com/images/modules/open_graph/github-logo.png",
+                        },
+                    }
+                ]
+            }
+            return data
 
         # Delete Discord Webhook Based on ID
         delete(
@@ -688,14 +812,24 @@ def subscription_delete(event):
             f"https://api.github.com/repos/{owner}/{repo}/hooks", headers=github_headers
         ).json()
 
-        for webhook in github_webhooks:
-            if webhook["config"]["url"] == webhook_url:
-                github_webhook_id = webhook["id"]
+        # Only try to delete GitHub webhook if we got a valid list
+        github_webhook_id = None
+        if isinstance(github_webhooks, list):
+            for webhook in github_webhooks:
+                if webhook.get("config", {}).get("url") == webhook_url:
+                    github_webhook_id = webhook["id"]
+                    break
 
-        delete(
-            f"https://api.github.com/repos/{owner}/{repo}/hooks/{github_webhook_id}",
-            headers=github_headers,
-        )
+            if github_webhook_id:
+                delete(
+                    f"https://api.github.com/repos/{owner}/{repo}/hooks/{github_webhook_id}",
+                    headers=github_headers,
+                )
+        else:
+            # GitHub API returned an error - log it but continue
+            # Discord webhook was already deleted, so report partial success
+            # Log error message only, not full response (may contain webhook URLs)
+            print(f"Could not fetch GitHub webhooks: {github_webhooks.get('message', 'unknown error')}")
 
         # Deletion Complete
         data = {
@@ -747,15 +881,16 @@ def status_list(event):
         url=f"https://discord.com/api/channels/{channel}/webhooks",
         headers=discord_headers,
     ).json()
-    print(f"DISCORD WEBHOOKS: {discord_webhooks}")
+    # Don't log webhook URLs - they contain sensitive tokens
+    print(f"DISCORD WEBHOOKS COUNT: {len(discord_webhooks) if isinstance(discord_webhooks, list) else 'error'}")
     try:
         webhooks_list = [name["name"] for name in discord_webhooks]
-    except:
+    except (TypeError, KeyError):
         data = {
             "embeds": [
                 {
                     "title": "Discord Permission Error",
-                    "description": f"Discord user `{discord_user}` can't list webhooks for <#{channel}>",
+                    "description": f"Cannot list webhooks for <#{channel}>. Ensure the bot has 'Manage Webhooks' permission in this channel.",
                     "color": 0xBD2C00,
                     "thumbnail": {
                         "url": "https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6cc3c481a15a141738_icon_clyde_white_RGB.png",
@@ -822,11 +957,22 @@ def lambda_processor(event, context):
     application = event["application_id"]
     token = event["token"]
 
+    # Default error response
+    data = {
+        "embeds": [
+            {
+                "title": "Unknown Command",
+                "description": "This command is not recognized. Use `/github status list`, `/github subscription create`, or `/github subscription delete`.",
+                "color": 0xBD2C00,
+            }
+        ]
+    }
+
     # Parse Subcommands
     if command == "status":
         if subcommand == "list":
             data = status_list(event)
-    if command == "subscription":
+    elif command == "subscription":
         if subcommand == "create":
             data = subscription_create(event)
         elif subcommand == "delete":

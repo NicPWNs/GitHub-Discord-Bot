@@ -8,6 +8,7 @@ from nacl.signing import VerifyKey
 # Load Secrets
 load_dotenv()
 PUBLIC_KEY = getenv("PUBLIC_KEY")
+SQS_QUEUE_URL = getenv("SQS_QUEUE_URL", "https://sqs.us-east-1.amazonaws.com/087441767329/github-discord-queue")
 
 
 # Signature Verification
@@ -27,7 +28,7 @@ def lambda_handler(event, context):
     # Signature Headers
     try:
         verify_signature(event)
-    except:
+    except Exception:
         raise Exception("401: Invalid Request Signature")
 
     # Ping Messages
@@ -38,7 +39,7 @@ def lambda_handler(event, context):
     # SQS Queue
     sqs = client("sqs")
     sqs.send_message(
-        QueueUrl="https://sqs.us-east-1.amazonaws.com/087441767329/github-discord-queue",
+        QueueUrl=SQS_QUEUE_URL,
         MessageBody=dumps(body),
     )
 
