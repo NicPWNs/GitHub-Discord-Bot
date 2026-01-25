@@ -413,6 +413,35 @@ def subscription_create(event, _retry=False):
             url=f"https://discord.com/api/channels/{channel}/webhooks",
             headers=discord_headers,
         ).json()
+
+        # Check for Discord API error response
+        if isinstance(discord_webhooks, dict) and "code" in discord_webhooks:
+            error_code = discord_webhooks.get("code")
+            error_msg = discord_webhooks.get("message", "Unknown error")
+            print(f"DISCORD ERROR: {error_code} - {error_msg}")
+
+            if error_code == 50013:
+                description = f"Missing Permissions. The bot needs 'Manage Webhooks' permission in <#{channel}>. Check the channel's permission overrides if the bot already has server-wide permissions."
+            elif error_code == 50001:
+                description = f"Missing Access. The bot cannot access <#{channel}>. Make sure the bot can see this channel."
+            elif error_code == 10003:
+                description = f"Unknown Channel. The channel <#{channel}> does not exist."
+            else:
+                description = f"Discord API error: {error_msg}"
+
+            return {
+                "embeds": [
+                    {
+                        "title": "Discord Error",
+                        "description": description,
+                        "color": 0xBD2C00,
+                        "thumbnail": {
+                            "url": "https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6cc3c481a15a141738_icon_clyde_white_RGB.png",
+                        },
+                    }
+                ]
+            }
+
         webhooks_list = [name["name"] for name in discord_webhooks]
 
         # All Webhook Name
@@ -464,16 +493,44 @@ def subscription_create(event, _retry=False):
                 json=data,
                 headers=discord_headers,
             ).json()
+
+            # Check for Discord API error response
+            if "code" in webhook:
+                error_code = webhook.get("code")
+                error_msg = webhook.get("message", "Unknown error")
+                print(f"DISCORD ERROR: {error_code} - {error_msg}")
+
+                if error_code == 30007:
+                    description = f"Discord channel <#{channel}> has reached the maximum of 15 webhooks. Delete unused webhooks and try again."
+                elif error_code == 50013:
+                    description = f"Missing Permissions. The bot needs 'Manage Webhooks' permission in <#{channel}>. Check the channel's permission overrides if the bot already has server-wide permissions."
+                elif error_code == 50001:
+                    description = f"Missing Access. The bot cannot access <#{channel}>. Make sure the bot can see this channel."
+                else:
+                    description = f"Discord API error: {error_msg}"
+
+                return {
+                    "embeds": [
+                        {
+                            "title": "Discord Error",
+                            "description": description,
+                            "color": 0xBD2C00,
+                            "thumbnail": {
+                                "url": "https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6cc3c481a15a141738_icon_clyde_white_RGB.png",
+                            },
+                        }
+                    ]
+                }
+
             webhook_id = webhook["id"]
             webhook_url = webhook["url"]
     except Exception as e:
         print(f"DISCORD ERROR: {e}")
-        # Could be webhook limit (15 max) or permission error
         data = {
             "embeds": [
                 {
                     "title": "Discord Error",
-                    "description": f"Could not create webhook in <#{channel}>. This may be due to the 15 webhook limit or missing permissions.",
+                    "description": f"Unexpected error creating webhook in <#{channel}>: {str(e)[:100]}",
                     "color": 0xBD2C00,
                     "thumbnail": {
                         "url": "https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6cc3c481a15a141738_icon_clyde_white_RGB.png",
