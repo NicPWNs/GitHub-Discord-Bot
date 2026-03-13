@@ -8,7 +8,6 @@ effort: trivial
 income_potential: none
 investment_required: none
 traction: "488 subscriptions"
-strategic: false
 blocked: false
 last_updated: 2026-03-13
 ---
